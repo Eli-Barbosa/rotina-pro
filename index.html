@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotina V9 - Alarme</title>
+    <style>
+        :root {
+            --bg: #f4f6f8; --card-bg: #ffffff; --text: #333; --text-light: #777;
+            --primary-btn: #4a90e2; --edit-btn: #f39c12; --danger: #e74c3c; --success: #2ecc71;
+            /* Cores Categorias */
+            --cat-trabalho: #4a90e2; --cat-saude: #2ecc71; --cat-estudos: #9b59b6;
+            --cat-casa: #f39c12; --cat-lazer: #e74c3c; --cat-outros: #95a5a6;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
+        
+        .app-container {
+            width: 100%; max-width: 500px; background: var(--card-bg);
+            box-shadow: 0 0 20px rgba(0,0,0,0.05); min-height: 100vh;
+            display: flex; flex-direction: column; position: relative; overflow-x: hidden;
+        }
+
+        /* --- HEADER --- */
+        .header-section {
+            padding: 20px; text-align: center; flex-grow: 1; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .header-top-row {
+            width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .header-actions { display: flex; gap: 15px; }
+
+        .btn-icon { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #ccc; transition: all 0.3s; }
+        .btn-icon:hover { transform: scale(1.1); }
+        .btn-icon.active { color: var(--primary-btn); text-shadow: 0 0 10px rgba(74, 144, 226, 0.4); }
+
+        h1 { margin: 0; font-size: 1.1rem; color: var(--text-light); }
+        .subtitle { font-size: 0.9rem; color: var(--primary-btn); font-weight: bold; margin-bottom: 15px; }
+
+        /* --- TIMER --- */
+        .timer-wrapper { position: relative; width: 220px; height: 220px; }
+        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .timer-circle-bg { fill: none; stroke: #f0f0f0; stroke-width: 8; }
+        .timer-circle-progress {
+            fill: none; stroke: var(--cat-outros); stroke-width: 8; stroke-linecap: round;
+            stroke-dasharray: 691; stroke-dashoffset: 691; transition: stroke-dashoffset 1s linear, stroke 0.5s;
+        }
+        .timer-info {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 40px;
+        }
+        .timer-current-task { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 5px; line-height: 1.2; }
+        .timer-countdown { font-size: 2.2rem; font-weight: 300; color: #333; margin: 5px 0; }
+        .timer-next { font-size: 0.8rem; color: var(--text-light); background: #f0f0f0; padding: 4px 10px; border-radius: 15px; }
+
+        /* --- DASHBOARD --- */
+        .dashboard-panel {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 200; transform: translateY(100%);
+            transition: transform 0.3s ease; overflow-y: auto; padding: 20px; box-sizing: border-box;
+        }
+        .dashboard-panel.open { transform: translateY(0); }
+        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .dash-card { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; }
+        .dash-title { font-size: 0.9rem; color: #777; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
+        .big-number { font-size: 2.5rem; font-weight: 800; color: var(--text); }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .stat-name { font-weight: 600; color: #555; }
+        .stat-val { font-weight: bold; }
+        .bad-stat { color: var(--danger); }
+        .good-stat { color: var(--success); }
+
+        /* --- DETALHES --- */
+        .details-panel {
+            max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.5s ease, opacity 0.3s ease;
+            background: #fafafa; border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 0 20px;
+        }
+        .app-container.details-open .details-panel {
+            max-height: 80vh; opacity: 1; padding-top: 20px; padding-bottom: 90px; overflow-y: auto; box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
+        }
+
+        /* --- FORMULÁRIOS & LISTAS --- */
+        .day-selector { display: flex; justify-content: space-between; margin-bottom: 20px; background: white; padding: 10px; border-radius: 12px; border: 1px solid #eee; }
+        .day-btn { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ddd; background: white; color: #777; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .day-btn.active { background: var(--primary-btn); color: white; transform: scale(1.1); }
+        .day-btn.today-indicator { border-color: var(--cat-saude); color: var(--cat-saude); }
+        .day-btn.active.today-indicator { color: white; }
+
+        .repeat-wrapper { margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; transition: opacity 0.3s; }
+        .repeat-wrapper.disabled { opacity: 0.4; pointer-events: none; }
+        .repeat-selector { display: flex; gap: 5px; justify-content: space-between;}
+        .repeat-btn { width: 28px; height: 28px; border-radius: 4px; border: 1px solid #eee; background: #f9f9f9; color: #999; cursor: pointer; }
+        .repeat-btn.selected { background: #333; color: white; }
+
+        .input-group { margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; border: 1px solid #eee; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .full-width { display: flex; gap: 10px; }
+        input, select { border: 1px solid #ddd; padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        
+        button.add-btn { background: var(--primary-btn); color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; min-width: 50px; }
+        button.add-btn.editing-mode { background: var(--edit-btn); }
+        .cancel-edit-btn { display: none; background: #999; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; margin-top: 5px; }
+
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { display: flex; align-items: center; background: white; border-bottom: 1px solid #eee; padding: 15px; margin-bottom: 8px; border-radius: 8px; border-left: 5px solid transparent; }
+        li.completed { opacity: 0.5; }
+        li.completed .task-desc { text-decoration: line-through; }
+        .task-checkbox { margin-right: 15px; width: 20px; height: 20px; }
+        .task-info { flex-grow: 1; }
+        .task-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #777;}
+        .cat-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; color: white; text-transform: uppercase; font-weight: bold; }
+        .punctuality-badge { font-size: 0.7rem; margin-left: auto; color: #777; }
+        .action-container { display: flex; gap: 10px; margin-left: 10px; }
+        .list-btn { background: transparent; border: none; cursor: pointer; font-size: 1.2rem; padding: 2px;}
+        .edit-btn-icon { color: var(--edit-btn); }
+        .delete-btn-icon { color: var(--danger); }
+
+        /* FAB */
+        .fab-toggle {
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
+            background-color: var(--primary-btn); color: white; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4); cursor: pointer; border: none; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container" id="appContainer">
+    
+    <div class="header-section">
+        <div class="header-top-row">
+            <h1 id="headerDate">Carregando...</h1>
+            <div class="header-actions">
+                <button class="btn-icon" id="alarmToggle" onclick="toggleAlarm()" title="Ativar Alarme">🔔</button>
+                <button class="btn-icon" onclick="openDashboard()" title="Ver Relatório">📊</button>
+            </div>
+        </div>
+        <div class="subtitle" id="dayStatus">Foco no Agora</div>
+        
+        <div class="timer-wrapper">
+            <svg class="timer-svg" viewBox="0 0 240 240">
+                <circle class="timer-circle-bg" cx="120" cy="120" r="110"></circle>
+                <circle class="timer-circle-progress" id="timerCircle" cx="120" cy="120" r="110"></circle>
+            </svg>
+            <div class="timer-info">
+                <div class="timer-current-task" id="timerTaskName">Livre</div>
+                <div class="timer-countdown" id="timerCountdown">--:--</div>
+                <div class="timer-next" id="timerNextLabel">...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-panel" id="dashboardPanel">
+        <div class="dash-header">
+            <h2>Seu Desempenho</h2>
+            <button class="btn-icon" onclick="closeDashboard()">✕</button>
+        </div>
+        <div class="dash-card">
+            <div class="dash-title">Taxa de Conclusão</div>
+            <div class="big-number" id="dashCompletionRate">--%</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-title">Negligenciadas</div>
+            <div id="dashSkippedList"><p>Sem dados.</p></div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-title">Pontualidade</div>
+            <div class="big-number" id="dashPunctuality">-- min</div>
+        </div>
+        <button onclick="clearHistory()" style="background:none; border:none; color:red; text-decoration:underline; cursor:pointer;">Limpar Histórico</button>
+    </div>
+
+    <div class="details-panel" id="detailsPanel">
+        <div style="padding-top: 10px;">
+            <h3 style="text-align:center; color:#555; margin-bottom:15px;">Planejamento</h3>
+            
+            <div class="day-selector">
+                <button class="day-btn" onclick="switchViewDay(0)" id="btnDay0">D</button>
+                <button class="day-btn" onclick="switchViewDay(1)" id="btnDay1">S</button>
+                <button class="day-btn" onclick="switchViewDay(2)" id="btnDay2">T</button>
+                <button class="day-btn" onclick="switchViewDay(3)" id="btnDay3">Q</button>
+                <button class="day-btn" onclick="switchViewDay(4)" id="btnDay4">Q</button>
+                <button class="day-btn" onclick="switchViewDay(5)" id="btnDay5">S</button>
+                <button class="day-btn" onclick="switchViewDay(6)" id="btnDay6">S</button>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <input type="time" id="taskTime" required>
+                    <select id="taskCategory">
+                        <option value="trabalho">Trabalho</option>
+                        <option value="saude">Saúde</option>
+                        <option value="estudos">Estudos</option>
+                        <option value="casa">Casa</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                <div class="full-width">
+                    <input type="text" id="taskDesc" placeholder="Atividade..." required>
+                    <button class="add-btn" id="mainActionBtn" onclick="handleAction()">+</button>
+                </div>
+                <div style="text-align: right;">
+                    <button class="cancel-edit-btn" id="cancelEditBtn" onclick="cancelEdit()">Cancelar Edição</button>
+                </div>
+                <div class="repeat-wrapper" id="repeatWrapper">
+                    <span style="font-size:0.8rem; color:#999;">Repetir em:</span>
+                    <div class="repeat-selector">
+                        <button class="repeat-btn" onclick="toggleRepeat(0)" id="rep0">D</button>
+                        <button class="repeat-btn" onclick="toggleRepeat(1)" id="rep1">S</button>
+                        <button class="repeat-btn" onclick="toggleRepeat(2)" id="rep2">T</button>
+                        <button class="repeat-btn" onclick="toggleRepeat(3)" id="rep3">Q</button>
+                        <button class="repeat-btn" onclick="toggleRepeat(4)" id="rep4">Q</button>
+                        <button class="repeat-btn" onclick="toggleRepeat(5)" id="rep5">S</button>
+                        <button class="repeat-btn" onclick="toggleRepeat(6)" id="rep6">S</button>
+                    </div>
+                </div>
+            </div>
+
+            <ul id="taskList"></ul>
+            <div style="height: 50px;"></div>
+        </div>
+    </div>
+
+    <button class="fab-toggle" id="toggleBtn" onclick="toggleDetails()">☰</button>
+
+</div>
+
+<script>
+    const categoryColors = { 'trabalho': '#4a90e2', 'saude': '#2ecc71', 'estudos': '#9b59b6', 'casa': '#f39c12', 'lazer': '#e74c3c', 'outros': '#95a5a6' };
+    
+    // Dados
+    const emptyWeek = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
+    let allTasks = JSON.parse(localStorage.getItem('myRoutineTasksV7')) || emptyWeek;
+    let historyLog = JSON.parse(localStorage.getItem('routineHistoryV7')) || [];
+
+    let todayIndex = new Date().getDay();
+    let viewIndex = todayIndex; 
+    let selectedRepeats = new Set();
+    let editingTaskIndex = null;
+
+    // ALARME VARS
+    let alarmEnabled = false;
+    let lastAlarmTime = null; // evita tocar repetido no mesmo minuto
+    // Som simples (beep URL confiável)
+    const alarmAudio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+    // Init
+    updateHeaderDate();
+    checkDailyReset();
+    renderDayButtons();
+    renderTasks();
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // --- ALARME & NOTIFICAÇÕES ---
+
+    function toggleAlarm() {
+        alarmEnabled = !alarmEnabled;
+        const btn = document.getElementById('alarmToggle');
+        
+        if (alarmEnabled) {
+            btn.classList.add('active');
+            // Tocar som mudo para 'destravar' áudio no navegador (hack mobile)
+            alarmAudio.play().then(() => {
+                alarmAudio.pause();
+                alarmAudio.currentTime = 0;
+            }).catch(e => console.log("Áudio precisa de interação"));
+
+            // Pedir permissão notificação
+            if (Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+        } else {
+            btn.classList.remove('active');
+        }
+    }
+
+    function checkAlarm(currentH, currentM) {
+        if (!alarmEnabled) return;
+
+        // Formato HH:MM
+        const timeStr = `${formatTime(currentH)}:${formatTime(currentM)}`;
+        
+        // Verifica se já tocou para este horário
+        if (lastAlarmTime === timeStr) return;
+
+        // Busca tarefas de HOJE (todayIndex) que batem com o horário e não foram feitas
+        const tasksNow = allTasks[todayIndex].filter(t => t.time === timeStr && !t.done);
+
+        if (tasksNow.length > 0) {
+            // Toca o alarme
+            alarmAudio.currentTime = 0;
+            alarmAudio.play().catch(e => console.log("Erro ao tocar alarme:", e));
+            
+            // Envia Notificação
+            if (Notification.permission === "granted") {
+                new Notification("Hora da Rotina!", {
+                    body: `Atividade: ${tasksNow[0].title}`,
+                    icon: "https://cdn-icons-png.flaticon.com/512/2693/2693507.png" // Ícone genérico
+                });
+            }
+            
+            // Marca que já tocou
+            lastAlarmTime = timeStr;
+        }
+    }
+
+    // --- LÓGICA DE TIMER (Atualizada com CheckAlarm) ---
+    function updateTimer() {
+        const dailyTasks = allTasks[todayIndex];
+        const elName = document.getElementById('timerTaskName'); const elCount = document.getElementById('timerCountdown');
+        const elNext = document.getElementById('timerNextLabel'); const elCircle = document.getElementById('timerCircle');
+        
+        const now = new Date();
+        const curH = now.getHours();
+        const curM = now.getMinutes();
+        const curS = now.getSeconds();
+        
+        // --- VERIFICA ALARME ---
+        // Checamos apenas quando os segundos viram 00 para economizar, ou a cada segundo se quiser precisão
+        if (curS === 0) { 
+            checkAlarm(curH, curM); 
+        }
+
+        const curMinTotal = curH * 60 + curM;
+
+        if (!dailyTasks || dailyTasks.length === 0) {
+            elName.textContent = "Dia Livre"; elCount.textContent = "--:--"; elNext.textContent = "Sem tarefas hoje"; elCircle.style.stroke = "#eee"; return;
+        }
+        
+        let actIdx = -1; let nxtIdx = -1;
+        const taskMin = dailyTasks.map(t => { const [h, m] = t.time.split(':').map(Number); return h * 60 + m; });
+        for (let i = 0; i < taskMin.length; i++) { if (curMinTotal >= taskMin[i]) actIdx = i; else { nxtIdx = i; break; } }
+        
+        const circum = 2 * Math.PI * 110;
+        if (actIdx === -1 && nxtIdx !== -1) {
+            elName.textContent = "Prepare-se"; elNext.textContent = `Próximo: ${dailyTasks[nxtIdx].title}`;
+            elCount.textContent = `-${(taskMin[nxtIdx] - curMinTotal - 1).toString().padStart(2,'0')}:${(60 - curS).toString().padStart(2,'0')}`;
+            elCircle.style.strokeDashoffset = 0; return;
+        }
+        if (nxtIdx === -1) { elName.textContent = "Tudo Feito!"; elCount.textContent = "00:00"; elCircle.style.strokeDashoffset = 0; return; }
+        if (actIdx !== -1 && nxtIdx !== -1) {
+            const curT = dailyTasks[actIdx]; elName.textContent = curT.title; elNext.textContent = `Depois: ${dailyTasks[nxtIdx].title}`;
+            elCircle.style.stroke = categoryColors[curT.category] || categoryColors['outros']; 
+            const rem = ((taskMin[nxtIdx] - taskMin[actIdx]) * 60) - (((curMinTotal - taskMin[actIdx]) * 60) + curS);
+            elCount.textContent = `${Math.floor(rem/60).toString().padStart(2,'0')}:${(rem%60).toString().padStart(2,'0')}`;
+            elCircle.style.strokeDashoffset = circum * (1 - (rem / ((taskMin[nxtIdx] - taskMin[actIdx]) * 60)));
+        }
+    }
+
+    // --- CRUD (Edição/Adição) ---
+    function startEdit(index) {
+        editingTaskIndex = index;
+        const task = allTasks[viewIndex][index];
+        document.getElementById('taskTime').value = task.time;
+        document.getElementById('taskDesc').value = task.title;
+        document.getElementById('taskCategory').value = task.category;
+        const btn = document.getElementById('mainActionBtn');
+        btn.innerHTML = "💾"; btn.classList.add('editing-mode');
+        document.getElementById('cancelEditBtn').style.display = 'inline-block';
+        document.getElementById('repeatWrapper').classList.add('disabled');
+        document.getElementById('taskDesc').focus();
+    }
+    function cancelEdit() {
+        editingTaskIndex = null;
+        document.getElementById('taskTime').value = '';
+        document.getElementById('taskDesc').value = '';
+        const btn = document.getElementById('mainActionBtn');
+        btn.innerHTML = "+"; btn.classList.remove('editing-mode');
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        document.getElementById('repeatWrapper').classList.remove('disabled');
+    }
+    function handleAction() {
+        const timeInput = document.getElementById('taskTime');
+        const descInput = document.getElementById('taskDesc');
+        const catInput = document.getElementById('taskCategory');
+        if (!timeInput.value || !descInput.value) { alert('Preencha os dados!'); return; }
+        if (editingTaskIndex !== null) {
+            allTasks[viewIndex][editingTaskIndex].time = timeInput.value;
+            allTasks[viewIndex][editingTaskIndex].title = descInput.value;
+            allTasks[viewIndex][editingTaskIndex].category = catInput.value;
+            allTasks[viewIndex].sort((a, b) => a.time.localeCompare(b.time));
+            saveAll(); renderTasks(); updateTimer(); cancelEdit();
+        } else {
+            let targetDays = selectedRepeats.size > 0 ? Array.from(selectedRepeats) : [viewIndex];
+            targetDays.forEach(day => {
+                allTasks[day].push({ time: timeInput.value, title: descInput.value, category: catInput.value, done: false, completedAt: null });
+                allTasks[day].sort((a, b) => a.time.localeCompare(b.time));
+            });
+            saveAll(); renderTasks(); updateTimer();
+            descInput.value = ''; selectedRepeats.clear();
+            document.querySelectorAll('.repeat-btn').forEach(b => b.classList.remove('selected'));
+        }
+    }
+    
+    // --- PADRÃO ---
+    function renderTasks() {
+        const list = document.getElementById('taskList'); list.innerHTML = '';
+        let tasksToShow = allTasks[viewIndex];
+        tasksToShow.forEach((task, index) => {
+            const li = document.createElement('li'); li.className = task.done ? 'completed' : '';
+            li.style.borderLeftColor = categoryColors[task.category] || categoryColors['outros'];
+            let punctualityBadge = '';
+            if (task.done && task.completedAt) {
+                const [sH, sM] = task.time.split(':').map(Number); const d = new Date(task.completedAt);
+                const diffMin = (d.getHours()*60 + d.getMinutes()) - (sH*60 + sM);
+                if (diffMin > 10) punctualityBadge = `<span class="punctuality-badge" style="color:red">Atraso ${diffMin}m</span>`;
+                else if (diffMin < -10) punctualityBadge = `<span class="punctuality-badge" style="color:green">Adiantado</span>`;
+                else punctualityBadge = `<span class="punctuality-badge" style="color:#2ecc71">No horário</span>`;
+            }
+            li.innerHTML = `
+                <input type="checkbox" class="task-checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${index})">
+                <div class="task-info">
+                    <div class="task-header"><span class="task-time">${task.time}</span><span class="cat-badge" style="background:${li.style.borderLeftColor}">${task.category}</span>${punctualityBadge}</div>
+                    <span class="task-desc">${task.title}</span>
+                </div>
+                <div class="action-container">
+                    <button class="list-btn edit-btn-icon" onclick="startEdit(${index})">✎</button>
+                    <button class="list-btn delete-btn-icon" onclick="deleteTask(${index})">&times;</button>
+                </div>`;
+            list.appendChild(li);
+        });
+    }
+    function checkDailyReset() {
+        const todayStr = new Date().toLocaleDateString(); const lastSavedDate = localStorage.getItem('lastRoutineDateV7');
+        if (lastSavedDate && lastSavedDate !== todayStr) { archiveTasks(lastSavedDate); for(let i=0; i<7; i++) allTasks[i] = allTasks[i].map(t => ({ ...t, done: false, completedAt: null })); saveAll(); }
+        localStorage.setItem('lastRoutineDateV7', todayStr);
+    }
+    function archiveTasks(dateLabel) { Object.values(allTasks).forEach(dayList => { dayList.forEach(task => { historyLog.push({ date: dateLabel, title: task.title, category: task.category, scheduledTime: task.time, done: task.done, completedAt: task.completedAt || null }); }); }); if (historyLog.length > 500) historyLog = historyLog.slice(historyLog.length - 500); localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); }
+    function calculateAnalytics() {
+        if (historyLog.length === 0) return;
+        const total = historyLog.length; const done = historyLog.filter(t => t.done).length;
+        const rate = Math.round((done / total) * 100); document.getElementById('dashCompletionRate').textContent = `${rate}%`;
+        const skippedMap = {}; historyLog.forEach(t => { if (!t.done) skippedMap[t.title] = (skippedMap[t.title] || 0) + 1; });
+        const sortedSkipped = Object.entries(skippedMap).sort((a,b) => b[1] - a[1]).slice(0, 3);
+        const skippedContainer = document.getElementById('dashSkippedList'); skippedContainer.innerHTML = '';
+        if (sortedSkipped.length === 0) skippedContainer.innerHTML = '<p>Nenhuma pendência frequente.</p>';
+        else sortedSkipped.forEach(([title, count]) => { skippedContainer.innerHTML += `<div class="stat-row"><span class="stat-name">${title}</span> <span class="stat-val bad-stat">${count}x</span></div>`; });
+        let totalDelay = 0; let countTimed = 0;
+        historyLog.forEach(t => { if (t.done && t.completedAt && t.scheduledTime) { const [sH, sM] = t.scheduledTime.split(':').map(Number); const d = new Date(t.completedAt); const diff = (d.getHours()*60 + d.getMinutes()) - (sH*60 + sM); if (Math.abs(diff) < 720) { totalDelay += diff; countTimed++; } } });
+        if (countTimed > 0) { const avg = Math.round(totalDelay / countTimed); document.getElementById('dashPunctuality').innerHTML = avg > 0 ? `<span class="bad-stat">${avg} min atraso</span>` : `<span class="good-stat">${Math.abs(avg)} min adiantado</span>`; } else document.getElementById('dashPunctuality').textContent = "--";
+    }
+    function openDashboard() { calculateAnalytics(); document.getElementById('dashboardPanel').classList.add('open'); }
+    function closeDashboard() { document.getElementById('dashboardPanel').classList.remove('open'); }
+    function clearHistory() { if(confirm('Apagar histórico?')) { historyLog = []; localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); calculateAnalytics(); } }
+    function updateHeaderDate() { document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); }
+    function switchViewDay(dayIndex) { viewIndex = dayIndex; cancelEdit(); renderDayButtons(); renderTasks(); }
+    function renderDayButtons() { for(let i=0; i<7; i++) { const btn = document.getElementById(`btnDay${i}`); btn.classList.remove('active', 'today-indicator'); if (i === viewIndex) btn.classList.add('active'); if (i === todayIndex) btn.classList.add('today-indicator'); } }
+    function toggleRepeat(dayIndex) { if(editingTaskIndex !== null) return; const btn = document.getElementById(`rep${dayIndex}`); if (selectedRepeats.has(dayIndex)) { selectedRepeats.delete(dayIndex); btn.classList.remove('selected'); } else { selectedRepeats.add(dayIndex); btn.classList.add('selected'); } }
+    function toggleDetails() { const container = document.getElementById('appContainer'); const btn = document.getElementById('toggleBtn'); container.classList.toggle('details-open'); if (container.classList.contains('details-open')) { btn.innerHTML = "&times;"; renderTasks(); } else { btn.innerHTML = "☰"; } }
+    function toggleTask(index) { const task = allTasks[viewIndex][index]; task.done = !task.done; task.completedAt = task.done ? new Date().toISOString() : null; saveAll(); renderTasks(); }
+    function deleteTask(index) { if(confirm('Excluir?')) { allTasks[viewIndex].splice(index, 1); saveAll(); renderTasks(); updateTimer(); cancelEdit(); } }
+    function saveAll() { localStorage.setItem('myRoutineTasksV7', JSON.stringify(allTasks)); }
+    function formatTime(val) { return val < 10 ? `0${val}` : val; }
+</script>
+</body>
+</html>
