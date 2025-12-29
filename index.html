@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V10</title>
+    <title>Rotina Pro V11 - Backup</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a90e2">
@@ -20,7 +20,7 @@
             --cat-estudos: #9b59b6;
             --cat-casa: #f39c12; 
             --cat-lazer: #e74c3c; 
-            --cat-eclesiastico: #DAA520; /* Dourado */
+            --cat-eclesiastico: #DAA520;
             --cat-outros: #95a5a6;
         }
 
@@ -66,7 +66,7 @@
         .timer-countdown { font-size: 2.2rem; font-weight: 300; color: #333; margin: 5px 0; }
         .timer-next { font-size: 0.8rem; color: var(--text-light); background: #f0f0f0; padding: 4px 10px; border-radius: 15px; }
 
-        /* --- DASHBOARD --- */
+        /* --- DASHBOARD & BACKUP --- */
         .dashboard-panel {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: white; z-index: 200; transform: translateY(100%);
@@ -82,6 +82,14 @@
         .stat-val { font-weight: bold; }
         .bad-stat { color: var(--danger); }
         .good-stat { color: var(--success); }
+        
+        /* Estilos dos botões de Backup */
+        .backup-section { margin-top: 30px; border-top: 2px dashed #eee; padding-top: 20px; }
+        .backup-btn { 
+            width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-download { background-color: #333; color: white; }
+        .btn-restore { background-color: #e0e0e0; color: #333; }
 
         /* --- DETALHES --- */
         .details-panel {
@@ -146,7 +154,7 @@
             <h1 id="headerDate">Carregando...</h1>
             <div class="header-actions">
                 <button class="btn-icon" id="alarmToggle" onclick="toggleAlarm()" title="Ativar Alarme">🔔</button>
-                <button class="btn-icon" onclick="openDashboard()" title="Ver Relatório">📊</button>
+                <button class="btn-icon" onclick="openDashboard()" title="Ver Relatório e Backup">📊</button>
             </div>
         </div>
         <div class="subtitle" id="dayStatus">Foco no Agora</div>
@@ -166,9 +174,10 @@
 
     <div class="dashboard-panel" id="dashboardPanel">
         <div class="dash-header">
-            <h2>Seu Desempenho</h2>
+            <h2>Gestão</h2>
             <button class="btn-icon" onclick="closeDashboard()">✕</button>
         </div>
+        
         <div class="dash-card">
             <div class="dash-title">Taxa de Conclusão</div>
             <div class="big-number" id="dashCompletionRate">--%</div>
@@ -181,7 +190,23 @@
             <div class="dash-title">Pontualidade</div>
             <div class="big-number" id="dashPunctuality">-- min</div>
         </div>
-        <button onclick="clearHistory()" style="background:none; border:none; color:red; text-decoration:underline; cursor:pointer;">Limpar Histórico</button>
+
+        <div class="backup-section">
+            <div class="dash-title" style="margin-bottom:15px;">Segurança dos Dados</div>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:10px;">Baixe seus dados para não perdê-los se limpar o cache.</p>
+            
+            <button class="backup-btn btn-download" onclick="exportBackup()">
+                📥 Baixar Backup (Salvar)
+            </button>
+            
+            <button class="backup-btn btn-restore" onclick="document.getElementById('backupInput').click()">
+                📤 Restaurar Backup
+            </button>
+            <input type="file" id="backupInput" style="display:none" accept=".json" onchange="importBackup(this)">
+        </div>
+
+        <button onclick="clearHistory()" style="background:none; border:none; color:red; text-decoration:underline; cursor:pointer; margin-top:20px;">Limpar Histórico e Resetar</button>
+        <div style="height: 50px;"></div>
     </div>
 
     <div class="details-panel" id="detailsPanel">
@@ -203,7 +228,8 @@
                     <input type="time" id="taskTime" required>
                     <select id="taskCategory">
                         <option value="trabalho">Trabalho</option>
-                        <option value="eclesiastico">Eclesiástico</option> <option value="saude">Saúde</option>
+                        <option value="eclesiastico">Eclesiástico</option>
+                        <option value="saude">Saúde</option>
                         <option value="estudos">Estudos</option>
                         <option value="casa">Casa</option>
                         <option value="lazer">Lazer</option>
@@ -241,15 +267,9 @@
 </div>
 
 <script>
-    // LISTA DE CORES ATUALIZADA
     const categoryColors = { 
-        'trabalho': '#4a90e2', 
-        'saude': '#2ecc71', 
-        'estudos': '#9b59b6', 
-        'casa': '#f39c12', 
-        'lazer': '#e74c3c', 
-        'eclesiastico': '#DAA520', // Cor Dourada para Eclesiástico
-        'outros': '#95a5a6' 
+        'trabalho': '#4a90e2', 'saude': '#2ecc71', 'estudos': '#9b59b6', 
+        'casa': '#f39c12', 'lazer': '#e74c3c', 'eclesiastico': '#DAA520', 'outros': '#95a5a6' 
     };
     
     // Dados
@@ -275,22 +295,65 @@
     setInterval(updateTimer, 1000);
     updateTimer();
 
-    // --- ALARME & NOTIFICAÇÕES ---
+    // --- FUNÇÕES DE BACKUP ---
+    function exportBackup() {
+        const data = {
+            tasks: localStorage.getItem('myRoutineTasksV7'),
+            history: localStorage.getItem('routineHistoryV7'),
+            date: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+        a.download = `backup-rotina-${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
 
+    function importBackup(inputElement) {
+        const file = inputElement.files[0];
+        if (!file) return;
+
+        if(!confirm('Atenção: Restaurar um backup irá substituir todos os dados atuais. Deseja continuar?')) {
+            inputElement.value = ''; // Limpa o input
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                // Validação simples
+                if (data.tasks) {
+                    localStorage.setItem('myRoutineTasksV7', data.tasks);
+                    if(data.history) localStorage.setItem('routineHistoryV7', data.history);
+                    
+                    alert('Backup restaurado com sucesso! O app será recarregado.');
+                    location.reload();
+                } else {
+                    alert('Erro: Arquivo de backup inválido.');
+                }
+            } catch (err) {
+                alert('Erro ao ler o arquivo. Certifique-se de que é um JSON válido.');
+                console.error(err);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // --- ALARME & NOTIFICAÇÕES ---
     function toggleAlarm() {
         alarmEnabled = !alarmEnabled;
         const btn = document.getElementById('alarmToggle');
-        
         if (alarmEnabled) {
             btn.classList.add('active');
             alarmAudio.play().then(() => {
-                alarmAudio.pause();
-                alarmAudio.currentTime = 0;
-            }).catch(e => console.log("Áudio precisa de interação"));
-
-            if (Notification.permission !== "granted") {
-                Notification.requestPermission();
-            }
+                alarmAudio.pause(); alarmAudio.currentTime = 0;
+            }).catch(e => console.log("Interação necessária"));
+            if (Notification.permission !== "granted") Notification.requestPermission();
         } else {
             btn.classList.remove('active');
         }
@@ -301,22 +364,17 @@
         const timeStr = `${formatTime(currentH)}:${formatTime(currentM)}`;
         if (lastAlarmTime === timeStr) return;
         const tasksNow = allTasks[todayIndex].filter(t => t.time === timeStr && !t.done);
-
         if (tasksNow.length > 0) {
             alarmAudio.currentTime = 0;
-            alarmAudio.play().catch(e => console.log("Erro ao tocar alarme:", e));
-            
+            alarmAudio.play().catch(e => console.log(e));
             if (Notification.permission === "granted") {
-                new Notification("Hora da Rotina!", {
-                    body: `Atividade: ${tasksNow[0].title}`,
-                    icon: "icon-512.png"
-                });
+                new Notification("Hora da Rotina!", { body: `Atividade: ${tasksNow[0].title}`, icon: "icon-512.png" });
             }
             lastAlarmTime = timeStr;
         }
     }
 
-    // --- LÓGICA DE TIMER ---
+    // --- TIMER & LÓGICA ---
     function updateTimer() {
         const dailyTasks = allTasks[todayIndex];
         const elName = document.getElementById('timerTaskName'); const elCount = document.getElementById('timerCountdown');
@@ -324,7 +382,6 @@
         
         const now = new Date();
         const curH = now.getHours(); const curM = now.getMinutes(); const curS = now.getSeconds();
-        
         if (curS === 0) { checkAlarm(curH, curM); }
 
         const curMinTotal = curH * 60 + curM;
@@ -398,7 +455,6 @@
         }
     }
     
-    // --- PADRÃO ---
     function renderTasks() {
         const list = document.getElementById('taskList'); list.innerHTML = '';
         let tasksToShow = allTasks[viewIndex];
@@ -426,6 +482,8 @@
             list.appendChild(li);
         });
     }
+    
+    // --- FUNÇÕES UTILITÁRIAS ---
     function checkDailyReset() {
         const todayStr = new Date().toLocaleDateString(); const lastSavedDate = localStorage.getItem('lastRoutineDateV7');
         if (lastSavedDate && lastSavedDate !== todayStr) { archiveTasks(lastSavedDate); for(let i=0; i<7; i++) allTasks[i] = allTasks[i].map(t => ({ ...t, done: false, completedAt: null })); saveAll(); }
@@ -445,9 +503,17 @@
         historyLog.forEach(t => { if (t.done && t.completedAt && t.scheduledTime) { const [sH, sM] = t.scheduledTime.split(':').map(Number); const d = new Date(t.completedAt); const diff = (d.getHours()*60 + d.getMinutes()) - (sH*60 + sM); if (Math.abs(diff) < 720) { totalDelay += diff; countTimed++; } } });
         if (countTimed > 0) { const avg = Math.round(totalDelay / countTimed); document.getElementById('dashPunctuality').innerHTML = avg > 0 ? `<span class="bad-stat">${avg} min atraso</span>` : `<span class="good-stat">${Math.abs(avg)} min adiantado</span>`; } else document.getElementById('dashPunctuality').textContent = "--";
     }
+
     function openDashboard() { calculateAnalytics(); document.getElementById('dashboardPanel').classList.add('open'); }
     function closeDashboard() { document.getElementById('dashboardPanel').classList.remove('open'); }
-    function clearHistory() { if(confirm('Apagar histórico?')) { historyLog = []; localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); calculateAnalytics(); } }
+    function clearHistory() { 
+        if(confirm('Isso apagará TODO o histórico e as tarefas atuais. Tem certeza?')) { 
+            historyLog = []; allTasks = emptyWeek;
+            saveAll(); localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); 
+            location.reload();
+        } 
+    }
+    
     function updateHeaderDate() { document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); }
     function switchViewDay(dayIndex) { viewIndex = dayIndex; cancelEdit(); renderDayButtons(); renderTasks(); }
     function renderDayButtons() { for(let i=0; i<7; i++) { const btn = document.getElementById(`btnDay${i}`); btn.classList.remove('active', 'today-indicator'); if (i === viewIndex) btn.classList.add('active'); if (i === todayIndex) btn.classList.add('today-indicator'); } }
