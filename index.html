@@ -3,25 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V10</title>
-    
+    <title>Rotina V9 - Alarme</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a90e2">
     <link rel="apple-touch-icon" href="icon-512.png">
     <link rel="icon" type="image/png" href="icon-512.png">
-
+    
     <style>
         :root {
             --bg: #f4f6f8; --card-bg: #ffffff; --text: #333; --text-light: #777;
             --primary-btn: #4a90e2; --edit-btn: #f39c12; --danger: #e74c3c; --success: #2ecc71;
             /* Cores Categorias */
-            --cat-trabalho: #4a90e2; 
-            --cat-saude: #2ecc71; 
-            --cat-estudos: #9b59b6;
-            --cat-casa: #f39c12; 
-            --cat-lazer: #e74c3c; 
-            --cat-eclesiastico: #DAA520; /* Dourado */
-            --cat-outros: #95a5a6;
+            --cat-trabalho: #4a90e2; --cat-saude: #2ecc71; --cat-estudos: #9b59b6;
+            --cat-casa: #f39c12; --cat-lazer: #e74c3c; --cat-outros: #95a5a6;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
@@ -203,7 +197,7 @@
                     <input type="time" id="taskTime" required>
                     <select id="taskCategory">
                         <option value="trabalho">Trabalho</option>
-                        <option value="eclesiastico">Eclesiástico</option> <option value="saude">Saúde</option>
+                        <option value="saude">Saúde</option>
                         <option value="estudos">Estudos</option>
                         <option value="casa">Casa</option>
                         <option value="lazer">Lazer</option>
@@ -241,16 +235,7 @@
 </div>
 
 <script>
-    // LISTA DE CORES ATUALIZADA
-    const categoryColors = { 
-        'trabalho': '#4a90e2', 
-        'saude': '#2ecc71', 
-        'estudos': '#9b59b6', 
-        'casa': '#f39c12', 
-        'lazer': '#e74c3c', 
-        'eclesiastico': '#DAA520', // Cor Dourada para Eclesiástico
-        'outros': '#95a5a6' 
-    };
+    const categoryColors = { 'trabalho': '#4a90e2', 'saude': '#2ecc71', 'estudos': '#9b59b6', 'casa': '#f39c12', 'lazer': '#e74c3c', 'outros': '#95a5a6' };
     
     // Dados
     const emptyWeek = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
@@ -264,7 +249,8 @@
 
     // ALARME VARS
     let alarmEnabled = false;
-    let lastAlarmTime = null; 
+    let lastAlarmTime = null; // evita tocar repetido no mesmo minuto
+    // Som simples (beep URL confiável)
     const alarmAudio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
     // Init
@@ -283,11 +269,13 @@
         
         if (alarmEnabled) {
             btn.classList.add('active');
+            // Tocar som mudo para 'destravar' áudio no navegador (hack mobile)
             alarmAudio.play().then(() => {
                 alarmAudio.pause();
                 alarmAudio.currentTime = 0;
             }).catch(e => console.log("Áudio precisa de interação"));
 
+            // Pedir permissão notificação
             if (Notification.permission !== "granted") {
                 Notification.requestPermission();
             }
@@ -298,34 +286,50 @@
 
     function checkAlarm(currentH, currentM) {
         if (!alarmEnabled) return;
+
+        // Formato HH:MM
         const timeStr = `${formatTime(currentH)}:${formatTime(currentM)}`;
+        
+        // Verifica se já tocou para este horário
         if (lastAlarmTime === timeStr) return;
+
+        // Busca tarefas de HOJE (todayIndex) que batem com o horário e não foram feitas
         const tasksNow = allTasks[todayIndex].filter(t => t.time === timeStr && !t.done);
 
         if (tasksNow.length > 0) {
+            // Toca o alarme
             alarmAudio.currentTime = 0;
             alarmAudio.play().catch(e => console.log("Erro ao tocar alarme:", e));
             
+            // Envia Notificação
             if (Notification.permission === "granted") {
                 new Notification("Hora da Rotina!", {
                     body: `Atividade: ${tasksNow[0].title}`,
-                    icon: "icon-512.png"
+                    icon: "https://cdn-icons-png.flaticon.com/512/2693/2693507.png" // Ícone genérico
                 });
             }
+            
+            // Marca que já tocou
             lastAlarmTime = timeStr;
         }
     }
 
-    // --- LÓGICA DE TIMER ---
+    // --- LÓGICA DE TIMER (Atualizada com CheckAlarm) ---
     function updateTimer() {
         const dailyTasks = allTasks[todayIndex];
         const elName = document.getElementById('timerTaskName'); const elCount = document.getElementById('timerCountdown');
         const elNext = document.getElementById('timerNextLabel'); const elCircle = document.getElementById('timerCircle');
         
         const now = new Date();
-        const curH = now.getHours(); const curM = now.getMinutes(); const curS = now.getSeconds();
+        const curH = now.getHours();
+        const curM = now.getMinutes();
+        const curS = now.getSeconds();
         
-        if (curS === 0) { checkAlarm(curH, curM); }
+        // --- VERIFICA ALARME ---
+        // Checamos apenas quando os segundos viram 00 para economizar, ou a cada segundo se quiser precisão
+        if (curS === 0) { 
+            checkAlarm(curH, curM); 
+        }
 
         const curMinTotal = curH * 60 + curM;
 
@@ -353,7 +357,7 @@
         }
     }
 
-    // --- CRUD ---
+    // --- CRUD (Edição/Adição) ---
     function startEdit(index) {
         editingTaskIndex = index;
         const task = allTasks[viewIndex][index];
