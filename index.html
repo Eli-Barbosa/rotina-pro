@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V13 - Dark Mode</title>
+    <title>Rotina Pro V14 - Completa</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a90e2">
@@ -14,125 +14,102 @@
 
     <style>
         :root {
-            /* Variaveis CLARAS (Padrão) */
-            --bg: #f4f6f8; 
-            --card-bg: #ffffff; 
-            --text: #333; 
-            --text-light: #777;
-            --primary-btn: #4a90e2; 
-            --edit-btn: #f39c12; 
-            --danger: #e74c3c; 
-            --success: #2ecc71;
-            
-            /* Cores Categorias */
-            --cat-trabalho: #4a90e2; --cat-saude: #2ecc71; --cat-estudos: #9b59b6;
-            --cat-casa: #f39c12; --cat-lazer: #e74c3c; --cat-eclesiastico: #DAA520; --cat-outros: #95a5a6;
-            
+            /* Variaveis CLARAS */
+            --bg: #f4f6f8; --card-bg: #ffffff; 
+            --text: #333; --text-light: #777; --text-muted: #999;
+            --primary-btn: #4a90e2; --edit-btn: #f39c12; --danger: #e74c3c; --success: #2ecc71;
             /* Gamificação */
             --xp-bar-bg: #e0e0e0; --xp-bar-fill: #FFD700; --level-badge: #333;
-            
-            /* UI Elements */
-            --border-color: #eee;
-            --input-bg: #fff;
-            --shadow: 0 0 20px rgba(0,0,0,0.05);
+            /* UI */
+            --border-color: #eee; --input-bg: #fff; --shadow: 0 0 20px rgba(0,0,0,0.05);
+            /* Categorias */
+            --cat-trabalho: #4a90e2; --cat-saude: #2ecc71; --cat-estudos: #9b59b6;
+            --cat-casa: #f39c12; --cat-lazer: #e74c3c; --cat-eclesiastico: #DAA520; --cat-outros: #95a5a6;
         }
 
         /* --- MODO ESCURO --- */
         body.dark-mode {
-            --bg: #121212; 
-            --card-bg: #1e1e1e; 
-            --text: #e0e0e0; 
-            --text-light: #aaa;
-            
-            --xp-bar-bg: #333;
-            --level-badge: #000;
-            
-            --border-color: #333;
-            --input-bg: #2c2c2c;
-            --shadow: 0 0 20px rgba(0,0,0,0.5);
+            --bg: #121212; --card-bg: #1e1e1e; 
+            --text: #e0e0e0; --text-light: #aaa; --text-muted: #666;
+            --xp-bar-bg: #333; --level-badge: #000;
+            --border-color: #333; --input-bg: #2c2c2c; --shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: background-color 0.3s, color 0.3s; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: 0.3s; }
         
         .app-container {
             width: 100%; max-width: 500px; background: var(--card-bg);
             box-shadow: var(--shadow); min-height: 100vh;
             display: flex; flex-direction: column; position: relative; overflow-x: hidden;
-            transition: background-color 0.3s;
         }
 
-        /* --- GAMIFICATION BAR & THEME --- */
+        /* Gamificação Topo */
         .gamification-bar {
             background: var(--card-bg); padding: 10px 20px; border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between; gap: 10px;
         }
-        .level-badge {
-            background: var(--level-badge); color: #fff; padding: 5px 10px; border-radius: 12px;
-            font-size: 0.8rem; font-weight: bold; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .xp-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-        .xp-text { font-size: 0.7rem; color: var(--text-light); margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .level-badge { background: var(--level-badge); color: #fff; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+        .xp-container { flex-grow: 1; }
+        .xp-text { font-size: 0.7rem; color: var(--text-light); display: flex; justify-content: space-between; margin-bottom: 2px; }
         .xp-track { width: 100%; height: 8px; background: var(--xp-bar-bg); border-radius: 4px; overflow: hidden; }
         .xp-fill { height: 100%; background: var(--xp-bar-fill); width: 0%; transition: width 0.5s ease; }
 
-        /* --- HEADER --- */
+        /* Header */
         .header-section { padding: 15px 20px; text-align: center; }
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .header-actions { display: flex; gap: 15px; }
-        .btn-icon { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #ccc; transition: all 0.3s; }
+        .header-top-row { display: flex; justify-content: space-between; align-items: center; }
+        .btn-icon { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #ccc; transition: 0.3s; }
         .btn-icon.active { color: var(--primary-btn); text-shadow: 0 0 10px rgba(74, 144, 226, 0.4); }
         h1 { margin: 0; font-size: 1rem; color: var(--text-light); }
-        .subtitle { font-size: 0.9rem; color: var(--primary-btn); font-weight: bold; margin-bottom: 10px; }
+        .subtitle { font-size: 0.9rem; color: var(--primary-btn); font-weight: bold; margin-bottom: 5px; }
+        
+        /* Frase do Dia */
+        .quote-box {
+            font-size: 0.8rem; font-style: italic; color: var(--text-muted); 
+            margin: 5px 0 15px 0; min-height: 30px; padding: 0 10px;
+        }
 
-        /* --- TIMER --- */
+        /* Timer */
         .timer-wrapper { position: relative; width: 180px; height: 180px; margin: 0 auto; }
         .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .timer-circle-bg { fill: none; stroke: var(--border-color); stroke-width: 8; transition: stroke 0.3s; }
-        .timer-circle-progress {
-            fill: none; stroke: var(--cat-outros); stroke-width: 8; stroke-linecap: round;
-            stroke-dasharray: 691; stroke-dashoffset: 691; transition: stroke-dashoffset 1s linear, stroke 0.5s;
-        }
-        .timer-info {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 30px;
-        }
-        .timer-current-task { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 2px; line-height: 1.2; }
-        .timer-countdown { font-size: 2rem; font-weight: 300; color: var(--text); margin: 2px 0; }
+        .timer-circle-bg { fill: none; stroke: var(--border-color); stroke-width: 8; }
+        .timer-circle-progress { fill: none; stroke: var(--cat-outros); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 691; stroke-dashoffset: 691; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
+        .timer-info { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .timer-current-task { font-size: 1rem; font-weight: 700; margin-bottom: 2px; line-height: 1.2; }
+        .timer-countdown { font-size: 2rem; font-weight: 300; margin: 2px 0; }
         .timer-next { font-size: 0.75rem; color: var(--text-light); background: var(--border-color); padding: 2px 8px; border-radius: 10px; }
 
-        /* --- PAINÉIS --- */
+        /* Painéis */
         .dashboard-panel, .details-panel {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--card-bg); z-index: 200; transform: translateY(100%); transition: transform 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--card-bg);
+            z-index: 200; transform: translateY(100%); transition: transform 0.3s ease;
             overflow-y: auto; padding: 20px; box-sizing: border-box; color: var(--text);
         }
         .dashboard-panel.open { transform: translateY(0); }
         .details-panel { 
             background: var(--bg); border-top-left-radius: 25px; border-top-right-radius: 25px; 
-            max-height: 0; opacity: 0; transition: max-height 0.5s ease, opacity 0.3s ease;
-            position: relative; transform: none; top: auto; left: auto; z-index: 10;
+            max-height: 0; opacity: 0; position: relative; transform: none; top: auto; left: auto; z-index: 10;
         }
         .app-container.details-open .details-panel { max-height: 80vh; opacity: 1; padding-bottom: 90px; }
 
         .dash-card { background: var(--input-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .dash-title { font-size: 0.9rem; color: var(--text-light); font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
-        .big-number { font-size: 2.5rem; font-weight: 800; color: var(--text); }
-        .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 5px 0; }
+        .big-number { font-size: 2.5rem; font-weight: 800; }
         
-        .backup-btn { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-download { background-color: #333; color: white; }
-        .btn-restore { background-color: #ccc; color: #333; }
-        body.dark-mode .btn-download { background-color: #444; }
-        body.dark-mode .btn-restore { background-color: #666; color: #fff; }
+        /* Diário */
+        .journal-area {
+            width: 100%; height: 100px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: var(--bg); color: var(--text); font-family: inherit; resize: none; box-sizing: border-box;
+        }
+        .journal-area:focus { outline: 2px solid var(--primary-btn); }
 
-        /* --- LISTA & INPUTS --- */
+        /* Inputs & Lista */
         .day-selector { display: flex; justify-content: space-between; margin-bottom: 20px; background: var(--input-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); }
-        .day-btn { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-light); font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .day-btn { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-light); font-weight: bold; cursor: pointer; }
         .day-btn.active { background: var(--primary-btn); color: white; border-color: var(--primary-btn); transform: scale(1.1); }
         .day-btn.today-indicator { border-color: var(--cat-saude); color: var(--cat-saude); }
         .day-btn.active.today-indicator { color: white; }
 
-        .input-group { margin-bottom: 20px; background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .input-group { background: var(--input-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px;}
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .full-width { display: flex; gap: 10px; }
         input, select { border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--card-bg); color: var(--text); }
@@ -148,32 +125,29 @@
         body.dark-mode .repeat-btn.selected { background: #ccc; color: #000; }
 
         ul { list-style: none; padding: 0; margin: 0; }
-        li { display: flex; align-items: center; background: var(--input-bg); border-bottom: 1px solid var(--border-color); padding: 15px; margin-bottom: 8px; border-radius: 8px; border-left: 5px solid transparent; transition: transform 0.2s; color: var(--text); }
+        li { display: flex; align-items: center; background: var(--input-bg); border-bottom: 1px solid var(--border-color); padding: 15px; margin-bottom: 8px; border-radius: 8px; border-left: 5px solid transparent; color: var(--text); }
         li.completed { opacity: 0.6; background-color: var(--bg); }
         li.completed .task-desc { text-decoration: line-through; }
         .task-checkbox { margin-right: 15px; width: 22px; height: 22px; cursor: pointer; accent-color: var(--success); }
         .task-info { flex-grow: 1; }
         .task-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-light);}
         .cat-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; color: white; text-transform: uppercase; font-weight: bold; }
-        .punctuality-badge { font-size: 0.7rem; margin-left: auto; color: var(--text-light); font-weight: bold; }
         .xp-gain { color: #f39c12; font-weight: bold; font-size: 0.75rem; animation: floatUp 1s ease-out forwards; display: inline-block; margin-left: 5px;}
-        
+        .punctuality-badge { font-size: 0.7rem; margin-left: auto; font-weight: bold; color: var(--text-light); }
+
         .action-container { display: flex; gap: 10px; margin-left: 10px; }
         .list-btn { background: transparent; border: none; cursor: pointer; font-size: 1.2rem; padding: 2px;}
         .edit-btn-icon { color: var(--edit-btn); }
         .delete-btn-icon { color: var(--danger); }
 
-        .fab-toggle {
-            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
-            background-color: var(--primary-btn); color: white; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 1.5rem;
-            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4); cursor: pointer; border: none; z-index: 100;
-        }
+        .backup-btn { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-download { background-color: #333; color: white; }
+        .btn-restore { background-color: #ccc; color: #333; }
+        body.dark-mode .btn-download { background-color: #444; }
 
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
-        }
+        .fab-toggle { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background-color: var(--primary-btn); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4); cursor: pointer; border: none; z-index: 100; }
+
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }
     </style>
 </head>
 <body>
@@ -183,13 +157,8 @@
     <div class="gamification-bar">
         <div class="level-badge" id="userLevelBadge">Lvl 1</div>
         <div class="xp-container">
-            <div class="xp-text">
-                <span>XP</span>
-                <span id="xpValues">0 / 100</span>
-            </div>
-            <div class="xp-track">
-                <div class="xp-fill" id="xpFill"></div>
-            </div>
+            <div class="xp-text"><span>XP</span><span id="xpValues">0 / 100</span></div>
+            <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
         </div>
         <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" style="font-size:1.2rem; margin-left:10px;">🌙</button>
     </div>
@@ -203,6 +172,7 @@
             </div>
         </div>
         <div class="subtitle" id="dayStatus">Foco no Agora</div>
+        <div class="quote-box" id="dailyQuote">"Tudo tem o seu tempo determinado..."</div>
         
         <div class="timer-wrapper">
             <svg class="timer-svg" viewBox="0 0 240 240">
@@ -219,40 +189,40 @@
 
     <div class="dashboard-panel" id="dashboardPanel">
         <div class="dash-header">
-            <h2>Gestão & Conquistas</h2>
+            <h2>Gestão & Reflexão</h2>
             <button class="btn-icon" onclick="closeDashboard()">✕</button>
         </div>
         
-        <div class="dash-card" style="text-align:center;">
+        <div class="dash-card">
             <div class="dash-title">Nível Atual</div>
             <div class="big-number" id="dashLevel" style="color:#f39c12">1</div>
-            <p style="font-size:0.8rem; color:var(--text-light);">Continue pontual para subir!</p>
         </div>
 
         <div class="dash-card">
-            <div class="dash-title">Taxa de Conclusão</div>
-            <div class="big-number" id="dashCompletionRate">--%</div>
+            <div class="dash-title">Diário de Gratidão ✍️</div>
+            <textarea id="journalInput" class="journal-area" placeholder="Pelo que você é grato hoje? O que aprendeu? Escreva aqui..." oninput="saveJournal()"></textarea>
+            <p style="font-size:0.7rem; color:var(--text-light); margin-top:5px;">Salvo automaticamente.</p>
         </div>
+
         <div class="dash-card">
-            <div class="dash-title">Pontualidade Média</div>
-            <div class="big-number" id="dashPunctuality">-- min</div>
+            <div class="dash-title">Conclusão Semanal</div>
+            <div class="big-number" id="dashCompletionRate">--%</div>
         </div>
 
         <div class="backup-section" style="margin-top:20px; border-top:1px dashed var(--border-color); padding-top:15px;">
-            <div class="dash-title">Segurança (Backup)</div>
+            <div class="dash-title">Backup Seguro</div>
             <button class="backup-btn btn-download" onclick="exportBackup()">📥 Baixar Dados</button>
             <button class="backup-btn btn-restore" onclick="document.getElementById('backupInput').click()">📤 Restaurar</button>
             <input type="file" id="backupInput" style="display:none" accept=".json" onchange="importBackup(this)">
         </div>
         
-        <button onclick="clearHistory()" style="color:red; background:none; border:none; margin-top:15px; text-decoration:underline; cursor:pointer;">Resetar Tudo</button>
+        <button onclick="clearHistory()" style="color:red; background:none; border:none; margin-top:15px; text-decoration:underline; cursor:pointer;">Resetar App</button>
         <div style="height:50px;"></div>
     </div>
 
     <div class="details-panel" id="detailsPanel">
         <div style="padding-top: 10px;">
             <h3 style="text-align:center; color:var(--text-light); margin-bottom:15px;">Planejamento</h3>
-            
             <div class="day-selector">
                 <button class="day-btn" onclick="switchViewDay(0)" id="btnDay0">D</button>
                 <button class="day-btn" onclick="switchViewDay(1)" id="btnDay1">S</button>
@@ -262,7 +232,6 @@
                 <button class="day-btn" onclick="switchViewDay(5)" id="btnDay5">S</button>
                 <button class="day-btn" onclick="switchViewDay(6)" id="btnDay6">S</button>
             </div>
-
             <div class="input-group">
                 <div class="input-row">
                     <input type="time" id="taskTime" required>
@@ -281,7 +250,7 @@
                     <button class="add-btn" id="mainActionBtn" onclick="handleAction()">+</button>
                 </div>
                 <div style="text-align: right;">
-                    <button class="cancel-edit-btn" id="cancelEditBtn" onclick="cancelEdit()">Cancelar Edição</button>
+                    <button class="cancel-edit-btn" id="cancelEditBtn" onclick="cancelEdit()">Cancelar</button>
                 </div>
                 <div class="repeat-wrapper" id="repeatWrapper">
                     <span style="font-size:0.8rem; color:var(--text-light);">Repetir em:</span>
@@ -296,30 +265,21 @@
                     </div>
                 </div>
             </div>
-
             <ul id="taskList"></ul>
             <div style="height: 50px;"></div>
         </div>
     </div>
-
     <button class="fab-toggle" id="toggleBtn" onclick="toggleDetails()">☰</button>
-
 </div>
 
 <script>
-    // --- CORES ---
-    const categoryColors = { 
-        'trabalho': '#4a90e2', 'saude': '#2ecc71', 'estudos': '#9b59b6', 
-        'casa': '#f39c12', 'lazer': '#e74c3c', 'eclesiastico': '#DAA520', 'outros': '#95a5a6' 
-    };
-    
-    // --- DADOS ---
+    // --- CORES & DADOS ---
+    const categoryColors = { 'trabalho': '#4a90e2', 'saude': '#2ecc71', 'estudos': '#9b59b6', 'casa': '#f39c12', 'lazer': '#e74c3c', 'eclesiastico': '#DAA520', 'outros': '#95a5a6' };
     const emptyWeek = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
     let allTasks = JSON.parse(localStorage.getItem('myRoutineTasksV7')) || emptyWeek;
     let historyLog = JSON.parse(localStorage.getItem('routineHistoryV7')) || [];
     let userXP = parseInt(localStorage.getItem('userXP')) || 0;
     let userLevel = parseInt(localStorage.getItem('userLevel')) || 1;
-
     let todayIndex = new Date().getDay();
     let viewIndex = todayIndex; 
     let selectedRepeats = new Set();
@@ -328,17 +288,49 @@
     let lastAlarmTime = null; 
     const alarmAudio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
+    // --- BANCO DE FRASES ---
+    const dailyQuotes = [
+        "Tudo posso naquele que me fortalece. (Filipenses 4:13)",
+        "O Senhor é meu pastor e nada me faltará. (Salmos 23:1)",
+        "Esforça-te, e tem bom ânimo. (Josué 1:9)",
+        "A disciplina é a liberdade.",
+        "Agradeça pelo que tem enquanto busca o que quer.",
+        "Não se preocupe com o amanhã, pois o amanhã trará as suas próprias preocupações.",
+        "O que você faz hoje ecoa na eternidade.",
+        "Alegrai-vos sempre no Senhor. (Filipenses 4:4)",
+        "Seja forte e corajoso."
+    ];
+
     // --- INIT ---
+    loadTheme();
     updateHeaderDate();
     checkDailyReset();
     renderDayButtons();
     updateXPUI();
-    loadTheme(); // Carrega o tema (Escuro/Claro)
     renderTasks();
+    renderQuote(); // Carrega frase
+    loadJournal(); // Carrega diário
     setInterval(updateTimer, 1000);
     updateTimer();
 
-    // --- DARK MODE LOGIC ---
+    // --- LÓGICA DE FRASES ---
+    function renderQuote() {
+        // Pega uma frase aleatória a cada carregamento
+        const randomIndex = Math.floor(Math.random() * dailyQuotes.length);
+        document.getElementById('dailyQuote').textContent = `"${dailyQuotes[randomIndex]}"`;
+    }
+
+    // --- LÓGICA DE DIÁRIO ---
+    function saveJournal() {
+        const text = document.getElementById('journalInput').value;
+        localStorage.setItem('dailyJournal', text);
+    }
+    function loadJournal() {
+        const savedText = localStorage.getItem('dailyJournal');
+        if (savedText) document.getElementById('journalInput').value = savedText;
+    }
+
+    // --- LÓGICA DE TEMA (DARK MODE) ---
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains('dark-mode');
@@ -347,22 +339,15 @@
     }
     function loadTheme() {
         const isDark = localStorage.getItem('darkMode') === 'true';
-        if (isDark) {
-            document.body.classList.add('dark-mode');
-            document.getElementById('themeBtn').innerText = "☀️";
-        } else {
-            document.getElementById('themeBtn').innerText = "🌙";
-        }
+        if (isDark) { document.body.classList.add('dark-mode'); document.getElementById('themeBtn').innerText = "☀️"; }
+        else { document.getElementById('themeBtn').innerText = "🌙"; }
     }
 
     // --- GAMIFICAÇÃO ---
     function getXpForNextLevel(level) { return level * 100; }
     function addXP(amount) {
-        userXP += amount;
-        let nextLevelXP = getXpForNextLevel(userLevel);
-        if (userXP >= nextLevelXP) {
-            userXP -= nextLevelXP; userLevel++; celebrateLevelUp();
-        }
+        userXP += amount; let nextLevelXP = getXpForNextLevel(userLevel);
+        if (userXP >= nextLevelXP) { userXP -= nextLevelXP; userLevel++; celebrateLevelUp(); }
         saveGamification(); updateXPUI();
     }
     function subtractXP(amount) { userXP = Math.max(0, userXP - amount); saveGamification(); updateXPUI(); }
@@ -377,44 +362,31 @@
     }
     function celebrateLevelUp() {
         var duration = 3000; var end = Date.now() + duration;
-        (function frame() {
-            confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-            confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
-            if (Date.now() < end) requestAnimationFrame(frame);
-        }());
+        (function frame() { confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } }); confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } }); if (Date.now() < end) requestAnimationFrame(frame); }());
         alert(`🎉 PARABÉNS! Você alcançou o Nível ${userLevel}!`);
     }
     function fireConfetti() { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); }
 
-    // --- TOGGLE TASK ---
+    // --- CORE TASKS ---
     function toggleTask(index) {
         const task = allTasks[viewIndex][index];
-        const wasDone = task.done;
-        task.done = !task.done;
+        const wasDone = task.done; task.done = !task.done;
         task.completedAt = task.done ? new Date().toISOString() : null;
-
         if (task.done && !wasDone) {
             let points = 10; 
-            const [sH, sM] = task.time.split(':').map(Number);
-            const now = new Date();
-            const taskMin = sH * 60 + sM;
-            const nowMin = now.getHours() * 60 + now.getMinutes();
-            const diff = nowMin - taskMin;
-            if (Math.abs(diff) <= 15) { points += 5; }
+            const [sH, sM] = task.time.split(':').map(Number); const now = new Date();
+            const taskMin = sH * 60 + sM; const nowMin = now.getHours() * 60 + now.getMinutes();
+            if (Math.abs(nowMin - taskMin) <= 15) { points += 5; }
             addXP(points); fireConfetti(); task.lastXPGain = `+${points} XP`; 
-        } else if (!task.done && wasDone) {
-            subtractXP(10); task.lastXPGain = null;
-        }
+        } else if (!task.done && wasDone) { subtractXP(10); task.lastXPGain = null; }
         saveAll(); renderTasks();
     }
-
-    // --- RENDER TASKS ---
+    
     function renderTasks() {
         const list = document.getElementById('taskList'); list.innerHTML = '';
         let tasksToShow = allTasks[viewIndex];
         tasksToShow.forEach((task, index) => {
-            const li = document.createElement('li'); 
-            li.className = task.done ? 'completed' : '';
+            const li = document.createElement('li'); li.className = task.done ? 'completed' : '';
             li.style.borderLeftColor = categoryColors[task.category] || categoryColors['outros'];
             let badges = '';
             if (task.done && task.lastXPGain) badges += `<span class="xp-gain">${task.lastXPGain}</span>`;
@@ -428,34 +400,25 @@
             li.innerHTML = `
                 <input type="checkbox" class="task-checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${index})">
                 <div class="task-info">
-                    <div class="task-header">
-                        <span class="task-time">${task.time}</span>
-                        <span class="cat-badge" style="background:${li.style.borderLeftColor}">${task.category}</span>
-                        ${badges}
-                    </div>
+                    <div class="task-header"><span class="task-time">${task.time}</span><span class="cat-badge" style="background:${li.style.borderLeftColor}">${task.category}</span>${badges}</div>
                     <span class="task-desc">${task.title}</span>
                 </div>
-                <div class="action-container">
-                    <button class="list-btn edit-btn-icon" onclick="startEdit(${index})">✎</button>
-                    <button class="list-btn delete-btn-icon" onclick="deleteTask(${index})">&times;</button>
-                </div>`;
+                <div class="action-container"><button class="list-btn edit-btn-icon" onclick="startEdit(${index})">✎</button><button class="list-btn delete-btn-icon" onclick="deleteTask(${index})">&times;</button></div>`;
             list.appendChild(li);
         });
     }
 
     // --- BACKUP ---
     function exportBackup() {
-        const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), xp: localStorage.getItem('userXP'), level: localStorage.getItem('userLevel'), date: new Date().toISOString() };
+        const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), xp: localStorage.getItem('userXP'), level: localStorage.getItem('userLevel'), journal: localStorage.getItem('dailyJournal'), date: new Date().toISOString() };
         const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url;
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
         const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-        a.download = `backup-gamified-${dateStr}.json`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        a.download = `backup-completo-${dateStr}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
     function importBackup(inputElement) {
         const file = inputElement.files[0]; if (!file) return;
-        if(!confirm('Isso substituirá suas tarefas, histórico e NÍVEL atual. Continuar?')) { inputElement.value = ''; return; }
+        if(!confirm('Restaurar backup substituirá TODOS os dados atuais. Continuar?')) { inputElement.value = ''; return; }
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
@@ -465,41 +428,26 @@
                     if(data.history) localStorage.setItem('routineHistoryV7', data.history);
                     if(data.xp) localStorage.setItem('userXP', data.xp);
                     if(data.level) localStorage.setItem('userLevel', data.level);
-                    alert('Backup restaurado! Recarregando...'); location.reload();
+                    if(data.journal) localStorage.setItem('dailyJournal', data.journal);
+                    alert('Restaurado com sucesso!'); location.reload();
                 } else { alert('Arquivo inválido.'); }
             } catch (err) { alert('Erro ao ler arquivo.'); }
         }; reader.readAsText(file);
     }
 
-    // --- UTILS ---
+    // --- UTILS & ALARME ---
     function updateHeaderDate() { document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); }
-    function checkDailyReset() {
-        const todayStr = new Date().toLocaleDateString(); const lastSavedDate = localStorage.getItem('lastRoutineDateV7');
-        if (lastSavedDate && lastSavedDate !== todayStr) { archiveTasks(lastSavedDate); for(let i=0; i<7; i++) allTasks[i] = allTasks[i].map(t => ({ ...t, done: false, completedAt: null, lastXPGain: null })); saveAll(); }
-        localStorage.setItem('lastRoutineDateV7', todayStr);
-    }
+    function checkDailyReset() { const todayStr = new Date().toLocaleDateString(); const lastSavedDate = localStorage.getItem('lastRoutineDateV7'); if (lastSavedDate && lastSavedDate !== todayStr) { archiveTasks(lastSavedDate); for(let i=0; i<7; i++) allTasks[i] = allTasks[i].map(t => ({ ...t, done: false, completedAt: null, lastXPGain: null })); saveAll(); } localStorage.setItem('lastRoutineDateV7', todayStr); }
     function archiveTasks(dateLabel) { Object.values(allTasks).forEach(dayList => { dayList.forEach(task => { historyLog.push({ date: dateLabel, title: task.title, category: task.category, scheduledTime: task.time, done: task.done, completedAt: task.completedAt || null }); }); }); if (historyLog.length > 500) historyLog = historyLog.slice(historyLog.length - 500); localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); }
     function openDashboard() { document.getElementById('dashboardPanel').classList.add('open'); }
     function closeDashboard() { document.getElementById('dashboardPanel').classList.remove('open'); }
-    function clearHistory() { if(confirm('Resetar TUDO (Tarefas, Histórico e Nível)?')) { localStorage.clear(); location.reload(); } }
+    function clearHistory() { if(confirm('Resetar TUDO?')) { localStorage.clear(); location.reload(); } }
     function switchViewDay(dayIndex) { viewIndex = dayIndex; cancelEdit(); renderDayButtons(); renderTasks(); }
     function renderDayButtons() { for(let i=0; i<7; i++) { const btn = document.getElementById(`btnDay${i}`); btn.classList.remove('active', 'today-indicator'); if (i === viewIndex) btn.classList.add('active'); if (i === todayIndex) btn.classList.add('today-indicator'); } }
     
     function startEdit(index) { editingTaskIndex = index; const task = allTasks[viewIndex][index]; document.getElementById('taskTime').value = task.time; document.getElementById('taskDesc').value = task.title; document.getElementById('taskCategory').value = task.category; document.getElementById('mainActionBtn').innerHTML = "💾"; document.getElementById('mainActionBtn').classList.add('editing-mode'); document.getElementById('cancelEditBtn').style.display = 'inline-block'; document.getElementById('repeatWrapper').classList.add('disabled'); }
     function cancelEdit() { editingTaskIndex = null; document.getElementById('taskTime').value = ''; document.getElementById('taskDesc').value = ''; document.getElementById('mainActionBtn').innerHTML = "+"; document.getElementById('mainActionBtn').classList.remove('editing-mode'); document.getElementById('cancelEditBtn').style.display = 'none'; document.getElementById('repeatWrapper').classList.remove('disabled'); }
-    function handleAction() { 
-        const timeInput = document.getElementById('taskTime'); const descInput = document.getElementById('taskDesc'); const catInput = document.getElementById('taskCategory');
-        if (!timeInput.value || !descInput.value) { alert('Preencha os dados!'); return; }
-        if (editingTaskIndex !== null) {
-            allTasks[viewIndex][editingTaskIndex].time = timeInput.value; allTasks[viewIndex][editingTaskIndex].title = descInput.value; allTasks[viewIndex][editingTaskIndex].category = catInput.value;
-            allTasks[viewIndex].sort((a, b) => a.time.localeCompare(b.time));
-            saveAll(); renderTasks(); updateTimer(); cancelEdit();
-        } else {
-            let targetDays = selectedRepeats.size > 0 ? Array.from(selectedRepeats) : [viewIndex];
-            targetDays.forEach(day => { allTasks[day].push({ time: timeInput.value, title: descInput.value, category: catInput.value, done: false, completedAt: null }); allTasks[day].sort((a, b) => a.time.localeCompare(b.time)); });
-            saveAll(); renderTasks(); updateTimer(); descInput.value = ''; selectedRepeats.clear(); document.querySelectorAll('.repeat-btn').forEach(b => b.classList.remove('selected'));
-        }
-    }
+    function handleAction() { const timeInput = document.getElementById('taskTime'); const descInput = document.getElementById('taskDesc'); const catInput = document.getElementById('taskCategory'); if (!timeInput.value || !descInput.value) { alert('Preencha os dados!'); return; } if (editingTaskIndex !== null) { allTasks[viewIndex][editingTaskIndex].time = timeInput.value; allTasks[viewIndex][editingTaskIndex].title = descInput.value; allTasks[viewIndex][editingTaskIndex].category = catInput.value; allTasks[viewIndex].sort((a, b) => a.time.localeCompare(b.time)); saveAll(); renderTasks(); updateTimer(); cancelEdit(); } else { let targetDays = selectedRepeats.size > 0 ? Array.from(selectedRepeats) : [viewIndex]; targetDays.forEach(day => { allTasks[day].push({ time: timeInput.value, title: descInput.value, category: catInput.value, done: false, completedAt: null }); allTasks[day].sort((a, b) => a.time.localeCompare(b.time)); }); saveAll(); renderTasks(); updateTimer(); descInput.value = ''; selectedRepeats.clear(); document.querySelectorAll('.repeat-btn').forEach(b => b.classList.remove('selected')); } }
     function deleteTask(index) { if(confirm('Excluir?')) { allTasks[viewIndex].splice(index, 1); saveAll(); renderTasks(); updateTimer(); cancelEdit(); } }
     function saveAll() { localStorage.setItem('myRoutineTasksV7', JSON.stringify(allTasks)); }
     function toggleRepeat(dayIndex) { if(editingTaskIndex !== null) return; const btn = document.getElementById(`rep${dayIndex}`); if (selectedRepeats.has(dayIndex)) { selectedRepeats.delete(dayIndex); btn.classList.remove('selected'); } else { selectedRepeats.add(dayIndex); btn.classList.add('selected'); } }
