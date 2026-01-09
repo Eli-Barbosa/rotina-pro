@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V24 - Disciplina Rígida</title>
+    <title>Rotina Pro V25 - Disciplina Total</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1b2a">
@@ -103,7 +103,7 @@
         .timer-countdown { font-size: 3rem; margin: 0; color: var(--text); letter-spacing: -1px; }
         .timer-next { font-size: 0.85rem; color: var(--card-bg); background: var(--pop-cyan); padding: 4px 12px; border-radius: 20px; margin-top: 8px; font-weight: bold; }
 
-        /* PAINÉIS */
+        /* DASHBOARD & DETAILS */
         .dashboard-panel, .details-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 200; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow-y: auto; padding: 25px; box-sizing: border-box; color: var(--text); }
         .dashboard-panel.open { transform: translateY(0); }
         .details-panel { background: var(--card-bg); border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.4); max-height: 0; opacity: 0; position: relative; transform: none; top: auto; left: auto; z-index: 10; transition: max-height 0.5s ease, opacity 0.3s ease; }
@@ -499,6 +499,26 @@
         if (lastEvaluationDate === todayStr) { showToast("Já avaliado hoje!", "info"); return; }
         const tasks = allTasks[todayIndex];
         if (!tasks || tasks.length === 0) { showToast("Sem tarefas hoje.", "warning"); return; }
+        
+        // --- NOVO: BLOQUEIO POR HORÁRIO DA ÚLTIMA TAREFA ---
+        let lastTaskMinutes = 0;
+        let lastTaskTimeStr = "";
+        tasks.forEach(t => {
+            const [h, m] = t.time.split(':').map(Number);
+            const mins = h * 60 + m;
+            if(mins > lastTaskMinutes) { lastTaskMinutes = mins; lastTaskTimeStr = t.time; }
+        });
+        
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        
+        // Bloqueia se ainda não chegou na hora da última tarefa
+        if (currentMinutes < lastTaskMinutes) {
+            showToast(`Aguarde a última tarefa (${lastTaskTimeStr})!`, "error");
+            return;
+        }
+        // ---------------------------------------------------
+
         const total = tasks.length; const completed = tasks.filter(t => t.done).length;
         let punctual = 0; tasks.forEach(t => { if (t.done && t.completedAt) { const [h, m] = t.time.split(':').map(Number); const d = new Date(t.completedAt); const diff = (d.getHours()*60 + d.getMinutes()) - (h*60 + m); if (Math.abs(diff) <= 15) punctual++; } });
         const pRate = total>0?punctual/total:0; const cRate = total>0?completed/total:0; let won = null;
@@ -512,26 +532,16 @@
 
     // --- FUNÇÃO PARA CONTROLE DE TEMPO (NOVO) ---
     function isTaskAllowed(taskTimeStr) {
-        if(viewIndex !== todayIndex) return "OK"; // Se estiver editando outro dia, permite (planejamento)
-        
+        if(viewIndex !== todayIndex) return "OK"; 
         const now = new Date();
         const [h, m] = taskTimeStr.split(':').map(Number);
-        const taskDate = new Date();
-        taskDate.setHours(h, m, 0, 0);
-
-        // Diferença em ms
+        const taskDate = new Date(); taskDate.setHours(h, m, 0, 0);
         const diff = now - taskDate;
-        
-        // Bloquear se tentar marcar ANTES da hora (com tolerância de 1 min para relógios adiantados)
         if (diff < -60000) return "WAIT"; 
-        
-        // Bloquear se passou 24h
         if (diff > (24 * 60 * 60 * 1000)) return "EXPIRED";
-        
         return "OK";
     }
 
-    // --- FUNÇÃO REINSERIDA & ATUALIZADA ---
     function updateSkippedStats() {
         const container = document.getElementById('dashSkippedList'); if (!container) return;
         if (historyLog.length === 0) { container.innerHTML = '<p style="font-size:0.9rem; color:var(--text-muted);">Sem dados.</p>'; return; }
@@ -550,30 +560,15 @@
     
     function toggleTask(index) { 
         const task = allTasks[viewIndex][index]; 
-        
-        // --- VALIDAÇÃO RIGOROSA (V24) ---
-        // Se a tarefa não está feita e tentamos marcar
+        // Validação Rigorosa
         if (!task.done) {
             const status = isTaskAllowed(task.time);
-            if (status === "WAIT") {
-                showToast("Ainda não chegou a hora!", "warning");
-                // Reverter checkbox visualmente (hack simples)
-                renderTasks(); 
-                return;
-            }
-            if (status === "EXPIRED") {
-                showToast("O prazo de 24h expirou!", "error");
-                renderTasks();
-                return;
-            }
+            if (status === "WAIT") { showToast("Ainda não é hora!", "warning"); renderTasks(); return; }
+            if (status === "EXPIRED") { showToast("Prazo expirado (24h)!", "error"); renderTasks(); return; }
         }
-
         const wasDone = task.done;
-        task.done = !task.done; 
-        task.completedAt = task.done ? new Date().toISOString() : null; 
-        
+        task.done = !task.done; task.completedAt = task.done ? new Date().toISOString() : null; 
         if(task.done && !wasDone) showFloatingXP(10); 
-        
         saveAll(); renderTasks(); updateDailyProgress();
     }
     
@@ -592,7 +587,7 @@
     function saveJournal() { localStorage.setItem('dailyJournal', document.getElementById('journalInput').value); }
     function loadJournal() { const t = localStorage.getItem('dailyJournal'); if(t) document.getElementById('journalInput').value = t; }
     function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('lightMode', document.body.classList.contains('light-mode')); document.getElementById('themeBtn').innerText = document.body.classList.contains('light-mode') ? "🌙" : "☀️"; }
-    function exportBackup() { const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), score: userScore, journal: localStorage.getItem('dailyJournal'), bible: { streak: bibleStreak, date: lastBibleDate }, date: new Date().toISOString() }; const b = new Blob([JSON.stringify(data)], {type:'application/json'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href=u; a.download=`backup-v22-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Salvo!", "success"); }
+    function exportBackup() { const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), score: userScore, journal: localStorage.getItem('dailyJournal'), bible: { streak: bibleStreak, date: lastBibleDate }, date: new Date().toISOString() }; const b = new Blob([JSON.stringify(data)], {type:'application/json'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href=u; a.download=`backup-v25-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Salvo!", "success"); }
     function importBackup(elm) { const f = elm.files[0]; if(!f) return; if(!confirm('Restaurar?')) return; const r = new FileReader(); r.onload = e => { try { const d = JSON.parse(e.target.result); if(d.tasks) { localStorage.setItem('myRoutineTasksV7', d.tasks); if(d.history) localStorage.setItem('routineHistoryV7', d.history); if(d.medals) localStorage.setItem('userMedals', d.medals); if(d.level) localStorage.setItem('userLevel', d.level); if(d.score) localStorage.setItem('userScore', d.score); if(d.journal) localStorage.setItem('dailyJournal', d.journal); if(d.bible) { localStorage.setItem('bibleStreak', d.bible.streak); localStorage.setItem('lastBibleDate', d.bible.date); } showToast("Restaurado!", "success"); setTimeout(()=>location.reload(), 1000); } } catch(err) { showToast("Erro", "error"); } }; r.readAsText(f); }
     
     function updateHeaderDate() { document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); }
