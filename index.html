@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V22.1 - Ultimate</title>
+    <title>Rotina Pro V24 - Disciplina Rígida</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1b2a">
@@ -34,13 +34,13 @@
         }
 
         * { box-sizing: border-box; }
-        body { font-family: 'Nunito', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: 0.3s; background-image: radial-gradient(var(--text-muted) 1px, transparent 1px); background-size: 30px 30px; background-blend-mode: overlay; opacity: 1; }
+        body { font-family: 'Nunito', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: 0.3s; background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 30px 30px; background-blend-mode: overlay; background-position: 0 0, 15px 15px; }
         
         h1, h2, h3, .level-badge, .timer-countdown, .dash-title, .evaluate-btn, .quest-title { font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px; }
         
         .app-container { width: 100%; max-width: 500px; background: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 100vh; display: flex; flex-direction: column; position: relative; overflow-x: hidden; border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); }
 
-        /* HUD & BARRA */
+        /* HUD ATUALIZADO */
         .gamification-bar { background: rgba(0,0,0,0.2); padding: 10px 15px; margin: 10px; border-radius: 16px; display: flex; flex-direction: column; gap: 8px; border: 2px solid rgba(255,255,255,0.05); }
         .hud-row-1 { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .level-badge { background: var(--pop-pink); color: white; padding: 4px 10px; border-radius: 10px; font-size: 0.9rem; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transform: rotate(-2deg); }
@@ -48,7 +48,7 @@
         .medals-display { display: flex; gap: 10px; justify-content: center; background: var(--input-bg); padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; }
         .medal-count { display: flex; align-items: center; gap: 3px; font-weight: 800; font-family: 'Fredoka', sans-serif; }
 
-        /* BARRA DE PROGRESSO DO DIA */
+        /* BARRA DE PROGRESSO */
         .daily-progress-container { margin: 0 0 20px 0; background: var(--input-bg); padding: 15px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.05); }
         .progress-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; font-family: 'Fredoka', sans-serif; color: var(--text); }
         .progress-track { height: 14px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; position: relative; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
@@ -510,7 +510,28 @@
         checkEvaluationButton();
     }
 
-    // --- FUNÇÃO QUE FALTAVA (REINSERIDA) ---
+    // --- FUNÇÃO PARA CONTROLE DE TEMPO (NOVO) ---
+    function isTaskAllowed(taskTimeStr) {
+        if(viewIndex !== todayIndex) return "OK"; // Se estiver editando outro dia, permite (planejamento)
+        
+        const now = new Date();
+        const [h, m] = taskTimeStr.split(':').map(Number);
+        const taskDate = new Date();
+        taskDate.setHours(h, m, 0, 0);
+
+        // Diferença em ms
+        const diff = now - taskDate;
+        
+        // Bloquear se tentar marcar ANTES da hora (com tolerância de 1 min para relógios adiantados)
+        if (diff < -60000) return "WAIT"; 
+        
+        // Bloquear se passou 24h
+        if (diff > (24 * 60 * 60 * 1000)) return "EXPIRED";
+        
+        return "OK";
+    }
+
+    // --- FUNÇÃO REINSERIDA & ATUALIZADA ---
     function updateSkippedStats() {
         const container = document.getElementById('dashSkippedList'); if (!container) return;
         if (historyLog.length === 0) { container.innerHTML = '<p style="font-size:0.9rem; color:var(--text-muted);">Sem dados.</p>'; return; }
@@ -528,9 +549,31 @@
     function fireConfetti(isBig) { confetti({ particleCount: isBig?150:50, spread: 70, origin: { y: 0.6 } }); }
     
     function toggleTask(index) { 
-        const task = allTasks[viewIndex][index]; const wasDone = task.done;
-        task.done = !task.done; task.completedAt = task.done ? new Date().toISOString() : null; 
+        const task = allTasks[viewIndex][index]; 
+        
+        // --- VALIDAÇÃO RIGOROSA (V24) ---
+        // Se a tarefa não está feita e tentamos marcar
+        if (!task.done) {
+            const status = isTaskAllowed(task.time);
+            if (status === "WAIT") {
+                showToast("Ainda não chegou a hora!", "warning");
+                // Reverter checkbox visualmente (hack simples)
+                renderTasks(); 
+                return;
+            }
+            if (status === "EXPIRED") {
+                showToast("O prazo de 24h expirou!", "error");
+                renderTasks();
+                return;
+            }
+        }
+
+        const wasDone = task.done;
+        task.done = !task.done; 
+        task.completedAt = task.done ? new Date().toISOString() : null; 
+        
         if(task.done && !wasDone) showFloatingXP(10); 
+        
         saveAll(); renderTasks(); updateDailyProgress();
     }
     
