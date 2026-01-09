@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V16 - Medalhas Ajustado</title>
+    <title>Rotina Pro V17 - Completa</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a90e2">
@@ -42,7 +42,7 @@
             display: flex; flex-direction: column; position: relative; overflow-x: hidden;
         }
 
-        /* BARRA DE MEDALHAS (Topo) */
+        /* BARRA DE MEDALHAS */
         .gamification-bar {
             background: var(--card-bg); padding: 10px 10px; border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between; gap: 5px;
@@ -94,6 +94,12 @@
         .dash-card { background: var(--input-bg); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .dash-title { font-size: 0.9rem; color: var(--text-light); font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
         .big-number { font-size: 2.5rem; font-weight: 800; }
+
+        /* ESTATÍSTICAS (Negligenciadas) */
+        .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 8px 0; font-size: 0.9rem; }
+        .stat-name { color: var(--text); }
+        .stat-val { font-weight: bold; }
+        .bad-stat { color: var(--danger); }
         
         /* Botão de Avaliar Dia */
         .evaluate-btn {
@@ -196,24 +202,26 @@
 
     <div class="dashboard-panel" id="dashboardPanel">
         <div class="dash-header">
-            <h2>Gestão & Medalhas</h2>
+            <h2>Gestão & Resultados</h2>
             <button class="btn-icon" onclick="closeDashboard()">✕</button>
         </div>
         
         <button class="evaluate-btn" id="btnEvaluate" onclick="evaluateDay()">
             🏆 Avaliar Desempenho do Dia
         </button>
-        <p style="text-align:center; font-size:0.8rem; color:var(--text-light); margin-top:-15px; margin-bottom:20px;">
-            100% Pontual = 🥇 | >70% = 🥈 | >50% Feito = 🥉
-        </p>
+
+        <div class="dash-card">
+            <div class="dash-title">⚠️ Onde Precisa Melhorar</div>
+            <div id="dashSkippedList">
+                <p style="font-size:0.8rem; color:var(--text-light);">Carregando dados...</p>
+            </div>
+        </div>
 
         <div class="dash-card">
             <div class="dash-title">Status do Nível</div>
             <div style="font-size:0.9rem;">
-                Colete para subir de nível:<br>
-                <strong>10 Ouros</strong> (🥇) OU<br>
-                <strong>20 Pratas</strong> (🥈) OU<br>
-                <strong>30 Bronzes</strong> (🥉).
+                Meta para subir de nível:<br>
+                <strong>10 Ouros</strong> (🥇) OU <strong>20 Pratas</strong> (🥈) OU <strong>30 Bronzes</strong> (🥉).
             </div>
         </div>
 
@@ -291,12 +299,9 @@
     const emptyWeek = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
     let allTasks = JSON.parse(localStorage.getItem('myRoutineTasksV7')) || emptyWeek;
     let historyLog = JSON.parse(localStorage.getItem('routineHistoryV7')) || [];
-    
-    // MEDALHAS
     let medals = JSON.parse(localStorage.getItem('userMedals')) || { gold: 0, silver: 0, bronze: 0 };
     let userLevel = parseInt(localStorage.getItem('userLevel')) || 1;
     let lastEvaluationDate = localStorage.getItem('lastEvalDate');
-
     let todayIndex = new Date().getDay();
     let viewIndex = todayIndex; 
     let selectedRepeats = new Set();
@@ -305,7 +310,6 @@
     let lastAlarmTime = null; 
     const alarmAudio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 
-    // --- BANCO DE FRASES ---
     const dailyQuotes = [
         "Tudo posso naquele que me fortalece. (Filipenses 4:13)",
         "O Senhor é meu pastor e nada me faltará. (Salmos 23:1)",
@@ -331,20 +335,47 @@
     updateTimer();
     checkEvaluationButton();
 
-    // --- LÓGICA DE AVALIAÇÃO E MEDALHAS (CORRIGIDO) ---
-    function evaluateDay() {
-        const todayStr = new Date().toLocaleDateString();
-        if (lastEvaluationDate === todayStr) {
-            alert("Você já avaliou o dia de hoje! Volte amanhã."); return;
+    // --- LÓGICA DE NEGLIGENCIADAS (Restaurada) ---
+    function updateSkippedStats() {
+        const container = document.getElementById('dashSkippedList'); 
+        if (!container) return;
+        
+        if (historyLog.length === 0) {
+            container.innerHTML = '<p style="font-size:0.8rem; color:var(--text-light);">Ainda não há dados suficientes.</p>';
+            return;
         }
 
+        const skippedMap = {}; 
+        historyLog.forEach(t => { 
+            if (!t.done) skippedMap[t.title] = (skippedMap[t.title] || 0) + 1; 
+        });
+        
+        const sortedSkipped = Object.entries(skippedMap).sort((a,b) => b[1] - a[1]).slice(0, 3);
+        container.innerHTML = '';
+        
+        if (sortedSkipped.length === 0) {
+            container.innerHTML = '<p style="font-size:0.8rem; color:var(--success);">Parabéns! Você não tem negligenciado tarefas.</p>';
+        } else {
+            sortedSkipped.forEach(([title, count]) => { 
+                container.innerHTML += `
+                    <div class="stat-row">
+                        <span class="stat-name">${title}</span> 
+                        <span class="stat-val bad-stat">${count}x</span>
+                    </div>`; 
+            });
+        }
+    }
+
+    // --- LÓGICA DE AVALIAÇÃO ---
+    function evaluateDay() {
+        const todayStr = new Date().toLocaleDateString();
+        if (lastEvaluationDate === todayStr) { alert("Você já avaliou o dia de hoje! Volte amanhã."); return; }
         const tasks = allTasks[todayIndex];
         if (!tasks || tasks.length === 0) { alert("Não há tarefas para avaliar hoje."); return; }
 
         const total = tasks.length;
         const completed = tasks.filter(t => t.done).length;
         let punctual = 0;
-
         tasks.forEach(t => {
             if (t.done && t.completedAt) {
                 const [sH, sM] = t.time.split(':').map(Number);
@@ -358,31 +389,23 @@
         const completionRate = total > 0 ? completed / total : 0;
         let medalWon = null;
 
-        if (punctualityRate >= 0.99) { 
-            medals.gold++; medalWon = "🥇 OURO (Pontualidade Perfeita)"; fireConfetti(true);
-        } else if (punctualityRate >= 0.7) {
-            medals.silver++; medalWon = "🥈 PRATA (Boa Pontualidade)"; fireConfetti(false);
-        } else if (completionRate >= 0.5) {
-            medals.bronze++; medalWon = "🥉 BRONZE (Tarefa Cumprida)"; fireConfetti(false);
-        } else {
-            alert("Continue tentando! Complete mais tarefas amanhã.");
-        }
+        if (punctualityRate >= 0.99) { medals.gold++; medalWon = "🥇 OURO (Pontualidade Perfeita)"; fireConfetti(true); } 
+        else if (punctualityRate >= 0.7) { medals.silver++; medalWon = "🥈 PRATA (Boa Pontualidade)"; fireConfetti(false); } 
+        else if (completionRate >= 0.5) { medals.bronze++; medalWon = "🥉 BRONZE (Tarefa Cumprida)"; fireConfetti(false); } 
+        else { alert("Continue tentando! Complete mais tarefas amanhã."); }
 
         if (medalWon) {
             alert(`Parabéns! Você ganhou uma medalha de ${medalWon}!`);
             lastEvaluationDate = todayStr;
             localStorage.setItem('lastEvalDate', lastEvaluationDate);
-            saveMedals();
-            checkLevelUp();
+            saveMedals(); checkLevelUp();
         }
         checkEvaluationButton();
     }
 
     function checkLevelUp() {
-        // Regra: 10 Ouros OU 20 Pratas OU 30 Bronzes
         if (medals.gold >= 10 || medals.silver >= 20 || medals.bronze >= 30) {
             userLevel++;
-            // Resetar ciclo
             medals.gold = 0; medals.silver = 0; medals.bronze = 0;
             saveMedals();
             alert(`🎉 INCRÍVEL! Você subiu para o NÍVEL ${userLevel}! Um novo ciclo começa agora.`);
@@ -391,89 +414,42 @@
         updateMedalsUI();
     }
 
-    function saveMedals() {
-        localStorage.setItem('userMedals', JSON.stringify(medals));
-        localStorage.setItem('userLevel', userLevel);
-        updateMedalsUI();
-    }
-
-    function updateMedalsUI() {
-        document.getElementById('userLevelBadge').innerText = `Nível ${userLevel}`;
-        document.getElementById('cntGold').innerText = medals.gold;
-        document.getElementById('cntSilver').innerText = medals.silver;
-        document.getElementById('cntBronze').innerText = medals.bronze;
-    }
-
-    function checkEvaluationButton() {
-        const todayStr = new Date().toLocaleDateString();
-        const btn = document.getElementById('btnEvaluate');
-        if (lastEvaluationDate === todayStr) {
-            btn.disabled = true; btn.innerText = "Dia já avaliado ✅"; btn.style.background = "#ccc";
-        } else {
-            btn.disabled = false; btn.innerText = "🏆 Avaliar Desempenho do Dia"; btn.style.background = "linear-gradient(135deg, #4a90e2, #9b59b6)";
-        }
-    }
-
-    // --- EFEITOS VISUAIS ---
-    function fireConfetti(isBig) {
-        const count = isBig ? 150 : 50;
-        confetti({ particleCount: count, spread: 70, origin: { y: 0.6 } });
-    }
-
-    // --- CORE TASKS ---
-    function toggleTask(index) {
-        const task = allTasks[viewIndex][index];
-        task.done = !task.done;
-        task.completedAt = task.done ? new Date().toISOString() : null;
-        saveAll(); renderTasks();
-    }
+    function saveMedals() { localStorage.setItem('userMedals', JSON.stringify(medals)); localStorage.setItem('userLevel', userLevel); updateMedalsUI(); }
+    function updateMedalsUI() { document.getElementById('userLevelBadge').innerText = `Nível ${userLevel}`; document.getElementById('cntGold').innerText = medals.gold; document.getElementById('cntSilver').innerText = medals.silver; document.getElementById('cntBronze').innerText = medals.bronze; }
+    function checkEvaluationButton() { const todayStr = new Date().toLocaleDateString(); const btn = document.getElementById('btnEvaluate'); if (lastEvaluationDate === todayStr) { btn.disabled = true; btn.innerText = "Dia já avaliado ✅"; btn.style.background = "#ccc"; } else { btn.disabled = false; btn.innerText = "🏆 Avaliar Desempenho do Dia"; btn.style.background = "linear-gradient(135deg, #4a90e2, #9b59b6)"; } }
+    function fireConfetti(isBig) { const count = isBig ? 150 : 50; confetti({ particleCount: count, spread: 70, origin: { y: 0.6 } }); }
     
+    // --- CORE TASKS ---
+    function toggleTask(index) { const task = allTasks[viewIndex][index]; task.done = !task.done; task.completedAt = task.done ? new Date().toISOString() : null; saveAll(); renderTasks(); }
     function renderTasks() {
-        const list = document.getElementById('taskList'); list.innerHTML = '';
-        let tasksToShow = allTasks[viewIndex];
+        const list = document.getElementById('taskList'); list.innerHTML = ''; let tasksToShow = allTasks[viewIndex];
         tasksToShow.forEach((task, index) => {
-            const li = document.createElement('li'); li.className = task.done ? 'completed' : '';
-            li.style.borderLeftColor = categoryColors[task.category] || categoryColors['outros'];
+            const li = document.createElement('li'); li.className = task.done ? 'completed' : ''; li.style.borderLeftColor = categoryColors[task.category] || categoryColors['outros'];
             let badges = '';
             if (task.done && task.completedAt) {
                 const [sH, sM] = task.time.split(':').map(Number); const d = new Date(task.completedAt);
                 const diffMin = (d.getHours()*60 + d.getMinutes()) - (sH*60 + sM);
-                if (diffMin > 15) badges += ` <span class="punctuality-badge" style="color:var(--danger)">Atraso</span>`;
-                else if (diffMin < -15) badges += ` <span class="punctuality-badge" style="color:var(--success)">Adiantado</span>`;
-                else badges += ` <span class="punctuality-badge" style="color:var(--cat-casa)">★ Pontual</span>`;
+                if (diffMin > 15) badges += ` <span class="punctuality-badge" style="color:var(--danger)">Atraso</span>`; else if (diffMin < -15) badges += ` <span class="punctuality-badge" style="color:var(--success)">Adiantado</span>`; else badges += ` <span class="punctuality-badge" style="color:var(--cat-casa)">★ Pontual</span>`;
             }
-            li.innerHTML = `
-                <input type="checkbox" class="task-checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${index})">
-                <div class="task-info">
-                    <div class="task-header"><span class="task-time">${task.time}</span><span class="cat-badge" style="background:${li.style.borderLeftColor}">${task.category}</span>${badges}</div>
-                    <span class="task-desc">${task.title}</span>
-                </div>
-                <div class="action-container"><button class="list-btn edit-btn-icon" onclick="startEdit(${index})">✎</button><button class="list-btn delete-btn-icon" onclick="deleteTask(${index})">&times;</button></div>`;
+            li.innerHTML = ` <input type="checkbox" class="task-checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${index})"> <div class="task-info"> <div class="task-header"><span class="task-time">${task.time}</span><span class="cat-badge" style="background:${li.style.borderLeftColor}">${task.category}</span>${badges}</div> <span class="task-desc">${task.title}</span> </div> <div class="action-container"><button class="list-btn edit-btn-icon" onclick="startEdit(${index})">✎</button><button class="list-btn delete-btn-icon" onclick="deleteTask(${index})">&times;</button></div>`;
             list.appendChild(li);
         });
     }
 
-    // --- RESTO DO CÓDIGO ---
+    // --- UTILS ---
     function renderQuote() { const i = Math.floor(Math.random() * dailyQuotes.length); document.getElementById('dailyQuote').textContent = `"${dailyQuotes[i]}"`; }
     function saveJournal() { localStorage.setItem('dailyJournal', document.getElementById('journalInput').value); }
     function loadJournal() { const t = localStorage.getItem('dailyJournal'); if(t) document.getElementById('journalInput').value = t; }
     function toggleTheme() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); document.getElementById('themeBtn').innerText = isDark ? "☀️" : "🌙"; localStorage.setItem('darkMode', isDark); }
     function loadTheme() { const isDark = localStorage.getItem('darkMode') === 'true'; if (isDark) { document.body.classList.add('dark-mode'); document.getElementById('themeBtn').innerText = "☀️"; } else { document.getElementById('themeBtn').innerText = "🌙"; } }
     
-    function exportBackup() {
-        const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), journal: localStorage.getItem('dailyJournal'), date: new Date().toISOString() };
-        const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
-        const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-'); a.download = `backup-medalhas-${dateStr}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
-    function importBackup(inputElement) {
-        const file = inputElement.files[0]; if (!file) return; if(!confirm('Restaurar backup substituirá TODOS os dados. Continuar?')) { inputElement.value = ''; return; }
-        const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if (data.tasks) { localStorage.setItem('myRoutineTasksV7', data.tasks); if(data.history) localStorage.setItem('routineHistoryV7', data.history); if(data.medals) localStorage.setItem('userMedals', data.medals); if(data.level) localStorage.setItem('userLevel', data.level); if(data.journal) localStorage.setItem('dailyJournal', data.journal); alert('Restaurado!'); location.reload(); } } catch (err) { alert('Erro ao ler.'); } }; reader.readAsText(file);
-    }
+    function exportBackup() { const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), journal: localStorage.getItem('dailyJournal'), date: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; const dateStr = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-'); a.download = `backup-v17-${dateStr}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+    function importBackup(inputElement) { const file = inputElement.files[0]; if (!file) return; if(!confirm('Restaurar backup substituirá TODOS os dados. Continuar?')) { inputElement.value = ''; return; } const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if (data.tasks) { localStorage.setItem('myRoutineTasksV7', data.tasks); if(data.history) localStorage.setItem('routineHistoryV7', data.history); if(data.medals) localStorage.setItem('userMedals', data.medals); if(data.level) localStorage.setItem('userLevel', data.level); if(data.journal) localStorage.setItem('dailyJournal', data.journal); alert('Restaurado!'); location.reload(); } } catch (err) { alert('Erro ao ler.'); } }; reader.readAsText(file); }
 
     function updateHeaderDate() { document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); }
     function checkDailyReset() { const todayStr = new Date().toLocaleDateString(); const lastSavedDate = localStorage.getItem('lastRoutineDateV7'); if (lastSavedDate && lastSavedDate !== todayStr) { archiveTasks(lastSavedDate); for(let i=0; i<7; i++) allTasks[i] = allTasks[i].map(t => ({ ...t, done: false, completedAt: null })); saveAll(); } localStorage.setItem('lastRoutineDateV7', todayStr); }
     function archiveTasks(dateLabel) { Object.values(allTasks).forEach(dayList => { dayList.forEach(task => { historyLog.push({ date: dateLabel, title: task.title, category: task.category, scheduledTime: task.time, done: task.done, completedAt: task.completedAt || null }); }); }); if (historyLog.length > 500) historyLog = historyLog.slice(historyLog.length - 500); localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); }
-    function openDashboard() { document.getElementById('dashboardPanel').classList.add('open'); checkEvaluationButton(); }
+    function openDashboard() { document.getElementById('dashboardPanel').classList.add('open'); checkEvaluationButton(); updateSkippedStats(); }
     function closeDashboard() { document.getElementById('dashboardPanel').classList.remove('open'); }
     function clearHistory() { if(confirm('Resetar TUDO?')) { localStorage.clear(); location.reload(); } }
     function switchViewDay(dayIndex) { viewIndex = dayIndex; cancelEdit(); renderDayButtons(); renderTasks(); }
