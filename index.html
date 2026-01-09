@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V25 - Disciplina Total</title>
+    <title>Rotina Pro V26 - App Layout</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1b2a">
@@ -22,7 +22,8 @@
             --pop-purple: #8338ec;
             
             /* UI */
-            --border-radius: 20px; --btn-shadow: 0 4px 0 rgba(0,0,0,0.3); --input-bg: #253247;
+            --border-radius: 20px; --input-bg: #253247;
+            --nav-height: 70px;
             
             /* Categorias */
             --cat-trabalho: #4cc9f0; --cat-saude: #8ac926; --cat-estudos: #ff006e;
@@ -30,147 +31,155 @@
         }
 
         body.light-mode {
-            --bg: #e0fbfc; --card-bg: #ffffff; --text: #2d3436; --text-muted: #636e72; --input-bg: #f1f4f9; --btn-shadow: 0 4px 0 #dfe6e9;
+            --bg: #e0fbfc; --card-bg: #ffffff; --text: #2d3436; --text-muted: #636e72; --input-bg: #f1f4f9;
         }
 
         * { box-sizing: border-box; }
-        body { font-family: 'Nunito', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: 0.3s; background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 30px 30px; background-blend-mode: overlay; background-position: 0 0, 15px 15px; }
+        body { 
+            font-family: 'Nunito', sans-serif; background-color: var(--bg); color: var(--text); 
+            margin: 0; display: flex; justify-content: center; min-height: 100vh; 
+            transition: 0.3s; overflow: hidden; /* Evita scroll no body, scroll é nas views */
+            background-image: radial-gradient(var(--text-muted) 1px, transparent 1px);
+            background-size: 30px 30px; background-blend-mode: overlay; opacity: 1;
+        }
         
         h1, h2, h3, .level-badge, .timer-countdown, .dash-title, .evaluate-btn, .quest-title { font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px; }
         
-        .app-container { width: 100%; max-width: 500px; background: var(--card-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 100vh; display: flex; flex-direction: column; position: relative; overflow-x: hidden; border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); }
+        .app-container { 
+            width: 100%; max-width: 500px; background: var(--bg); 
+            height: 100vh; position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
 
-        /* HUD ATUALIZADO */
-        .gamification-bar { background: rgba(0,0,0,0.2); padding: 10px 15px; margin: 10px; border-radius: 16px; display: flex; flex-direction: column; gap: 8px; border: 2px solid rgba(255,255,255,0.05); }
-        .hud-row-1 { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .level-badge { background: var(--pop-pink); color: white; padding: 4px 10px; border-radius: 10px; font-size: 0.9rem; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transform: rotate(-2deg); }
-        .score-display { font-family: 'Fredoka', sans-serif; font-size: 0.9rem; color: var(--pop-cyan); font-weight: bold; text-shadow: 0 2px 0 rgba(0,0,0,0.3); }
-        .medals-display { display: flex; gap: 10px; justify-content: center; background: var(--input-bg); padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; }
-        .medal-count { display: flex; align-items: center; gap: 3px; font-weight: 800; font-family: 'Fredoka', sans-serif; }
+        /* --- VIEWS (TELAS) --- */
+        .view-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 90px; /* Espaço para o menu */
+            display: none; /* Oculto por padrão */
+            animation: fadeIn 0.3s ease-out;
+        }
+        .view-section.active { display: block; }
 
-        /* BARRA DE PROGRESSO */
-        .daily-progress-container { margin: 0 0 20px 0; background: var(--input-bg); padding: 15px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.05); }
-        .progress-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; font-weight: bold; font-family: 'Fredoka', sans-serif; color: var(--text); }
-        .progress-track { height: 14px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; position: relative; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--pop-orange), var(--pop-yellow), var(--pop-green)); width: 0%; transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 10px; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .medal-marker { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.5); z-index: 2; }
-        .marker-bronze { left: 50%; } .marker-silver { left: 70%; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- BOTTOM NAVIGATION (MENU INFERIOR) --- */
+        .bottom-nav {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
+            background: var(--card-bg); border-top: 2px solid var(--pop-cyan);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            border-radius: 20px 20px 0 0;
+        }
+        .nav-btn {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 0.8rem; font-family: 'Fredoka', sans-serif; font-weight: bold;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            cursor: pointer; transition: 0.2s; width: 60px;
+        }
+        .nav-btn i { font-size: 1.5rem; display: block; margin-bottom: 2px; transition: 0.2s; }
+        .nav-btn.active { color: var(--pop-yellow); transform: translateY(-5px); }
+        .nav-btn.active i { color: var(--pop-cyan); text-shadow: 0 0 10px var(--pop-cyan); }
+
+        /* --- HEADER --- */
+        .header-simple { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-title { font-size: 1.5rem; color: var(--pop-yellow); margin: 0; }
+        
+        /* --- ESTILOS GERAIS (Mantidos da V25) --- */
+        /* Timer */
+        .timer-wrapper { position: relative; width: 240px; height: 240px; margin: 20px auto; }
+        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .timer-circle-bg { fill: none; stroke: var(--input-bg); stroke-width: 15; stroke-linecap: round; }
+        .timer-circle-progress { fill: none; stroke: var(--pop-green); stroke-width: 15; stroke-linecap: round; stroke-dasharray: 691; stroke-dashoffset: 691; transition: stroke-dashoffset 1s linear, stroke 0.5s; filter: drop-shadow(0 0 5px var(--pop-green)); }
+        .timer-info { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .timer-current-task { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; color: var(--text); }
+        .timer-countdown { font-size: 3.5rem; margin: 0; color: var(--text); letter-spacing: -1px; }
+        .timer-next { font-size: 0.9rem; color: var(--card-bg); background: var(--pop-cyan); padding: 5px 15px; border-radius: 20px; margin-top: 10px; font-weight: bold; }
+
+        /* Cards e Widgets */
+        .dash-card { background: var(--input-bg); padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.05); }
+        .dash-card:hover { border-color: var(--pop-cyan); }
+        .dash-title { font-size: 1rem; color: var(--pop-yellow); margin-bottom: 10px; display: block; }
+        
+        .quest-card { background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 3px solid #ab47bc; box-shadow: 0 6px 0 #4a148c; position: relative; overflow: hidden; }
+        .quest-card::after { content: '✝️'; position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.2; transform: rotate(-15deg); }
+        .quest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .quest-tag { background: #ab47bc; font-size: 0.7rem; padding: 4px 8px; border-radius: 8px; font-weight: bold; }
+        .quest-btn { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 12px; background: #fff; color: #4a148c; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: 0.1s; }
+        .quest-btn:active { transform: translateY(4px); box-shadow: none; }
+        .quest-btn:disabled { background: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); cursor: default; transform: translateY(4px); box-shadow: none; }
+
+        /* Lista de Tarefas */
+        .day-selector { display: flex; justify-content: space-between; margin-bottom: 20px; background: var(--input-bg); padding: 8px; border-radius: 20px; }
+        .day-btn { width: 40px; height: 40px; border-radius: 12px; border: none; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .day-btn.active { background: var(--pop-cyan); color: #fff; transform: scale(1.1); }
+        .day-btn.today-indicator { color: var(--pop-yellow); }
+        
+        .input-group { background: var(--input-bg); padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.05); }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .full-width { display: flex; gap: 10px; }
+        input, select { border: 2px solid transparent; padding: 12px; border-radius: 12px; width: 100%; background: rgba(0,0,0,0.3); color: var(--text); font-weight: bold; }
+        input:focus, select:focus { outline: none; border-color: var(--pop-pink); }
+        button.add-btn { background: var(--pop-yellow); color: #0d1b2a; border: none; padding: 0 20px; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: 900; box-shadow: 0 4px 0 #cc9a00; }
+        button.add-btn:active { transform: translateY(4px); box-shadow: none; }
+        button.add-btn.editing-mode { background: var(--pop-pink); box-shadow: 0 4px 0 #b0004c; color: white; }
+
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { display: flex; align-items: center; background: var(--input-bg); border-radius: 16px; margin-bottom: 12px; padding: 15px; color: var(--text); position: relative; overflow: hidden; border-left: 5px solid transparent; }
+        li.completed { opacity: 0.6; filter: grayscale(0.5); }
+        li.completed .task-desc { text-decoration: line-through; color: var(--text-muted); }
+        .task-checkbox { width: 24px; height: 24px; margin-right: 15px; accent-color: var(--pop-green); cursor: pointer; }
+        .task-info { flex-grow: 1; }
+        .task-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px; }
+        .task-desc { font-size: 1.1rem; font-weight: 700; }
+        .cat-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 6px; color: #fff; font-weight: 800; }
+        .action-container { display: flex; gap: 10px; margin-left: 10px; }
+        .list-btn { background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1rem; color: var(--text); }
+
+        /* HUD Perfil */
+        .gamification-bar { background: var(--input-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; border: 2px solid rgba(255,255,255,0.05); }
+        .hud-row-1 { display: flex; justify-content: space-between; align-items: center; }
+        .level-badge { background: var(--pop-pink); padding: 5px 10px; border-radius: 8px; font-weight: bold; }
+        .medals-display { display: flex; gap: 15px; justify-content: center; margin-top: 5px; }
+        
+        .daily-progress-container { margin-bottom: 20px; background: var(--input-bg); padding: 15px; border-radius: 16px; }
+        .progress-track { height: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; overflow: hidden; position: relative; margin-top: 5px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--pop-orange), var(--pop-yellow), var(--pop-green)); width: 0%; transition: width 0.5s; }
+        .medal-marker { position: absolute; top:0; bottom:0; width:2px; background:rgba(255,255,255,0.5); }
+        
+        .evaluate-btn { width: 100%; padding: 18px; background: var(--pop-green); color: #fff; border: none; border-radius: 16px; font-size: 1.1rem; cursor: pointer; box-shadow: 0 6px 0 #5f8d18; margin-bottom: 20px; font-weight: bold; }
+        .evaluate-btn:disabled { background: var(--text-muted); box-shadow: none; cursor: not-allowed; }
+
+        .btn-icon-small { width: 35px; height: 35px; border-radius: 50%; border: none; background: rgba(255,255,255,0.1); color: var(--text); cursor: pointer; }
+        .btn-icon-small.active { background: var(--pop-yellow); color: #000; }
 
         /* XP FLUTUANTE */
-        .floating-xp {
-            position: fixed; color: var(--pop-yellow); font-family: 'Fredoka', sans-serif; font-weight: 900; font-size: 1.8rem;
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.5); pointer-events: none; z-index: 9999;
-            animation: floatUpFade 1.5s ease-out forwards;
-        }
+        .floating-xp { position: fixed; color: var(--pop-yellow); font-family: 'Fredoka', sans-serif; font-weight: 900; font-size: 1.8rem; text-shadow: 2px 2px 0 rgba(0,0,0,0.5); pointer-events: none; z-index: 9999; animation: floatUpFade 1.5s ease-out forwards; }
         @keyframes floatUpFade { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.5); } }
 
         /* TOASTS */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .gamer-toast { background: var(--card-bg); color: var(--text); padding: 15px 20px; border-radius: 16px; border: 2px solid var(--pop-cyan); box-shadow: 0 8px 20px rgba(0,0,0,0.3); font-family: 'Fredoka', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 10px; transform: translateX(120%); animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; pointer-events: auto; min-width: 260px; }
-        .gamer-toast.success { border-color: var(--pop-green); background: #f0fff4; color: #2d3436; }
-        .gamer-toast.quest { border-color: var(--pop-purple); background: #f3e5f5; color: #4a148c; }
-        .gamer-toast.warning { border-color: var(--pop-yellow); background: #fffbe6; color: #2d3436; }
-        .gamer-toast.error { border-color: var(--pop-pink); background: #fff0f6; color: #2d3436; }
-        .gamer-toast.level-up { border: none; background: linear-gradient(135deg, var(--pop-pink), var(--pop-yellow)); color: #fff; box-shadow: 0 10px 25px rgba(255, 0, 110, 0.4); }
-        @keyframes slideIn { to { transform: translateX(0); } }
-        @keyframes slideOut { to { transform: translateX(120%) scale(0.8); opacity: 0; } }
+        .gamer-toast { background: var(--card-bg); color: var(--text); padding: 15px 20px; border-radius: 16px; border: 2px solid var(--pop-cyan); box-shadow: 0 8px 20px rgba(0,0,0,0.3); font-family: 'Fredoka', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 10px; transform: translateX(120%); animation: slideIn 0.3s forwards; pointer-events: auto; }
+        .gamer-toast.success { border-color: var(--pop-green); } .gamer-toast.error { border-color: var(--pop-pink); }
+        @keyframes slideIn { to { transform: translateX(0); } } @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
 
-        /* QUEST CARD */
-        .quest-card { background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 3px solid #ab47bc; box-shadow: 0 6px 0 #4a148c; position: relative; overflow: hidden; }
-        .quest-card::after { content: '✝️'; position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.2; transform: rotate(-15deg); }
-        .quest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .quest-tag { background: #ab47bc; font-size: 0.7rem; padding: 4px 8px; border-radius: 8px; font-weight: bold; text-transform: uppercase; }
-        .quest-xp { background: var(--pop-yellow); color: #000; padding: 4px 8px; border-radius: 8px; font-weight: 900; }
-        .quest-btn { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 12px; background: #fff; color: #4a148c; font-weight: 900; font-family: 'Fredoka', sans-serif; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: 0.1s; }
-        .quest-btn:active { transform: translateY(4px); box-shadow: none; }
-        .quest-btn:disabled { background: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); cursor: default; transform: translateY(4px); box-shadow: none; }
-
-        /* HEADER & TIMER */
-        .header-section { padding: 20px; text-align: center; }
-        .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .btn-icon { background: var(--input-bg); border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 1.4rem; cursor: pointer; color: var(--text); transition: 0.2s; display:grid; place-items:center; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
-        .btn-icon:hover { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); background: var(--pop-cyan); color: #fff; }
-        .btn-icon.active { background: var(--pop-yellow); color: #000; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); transform: translateY(4px); }
-        h1 { margin: 0; font-size: 1.4rem; color: var(--pop-yellow); text-shadow: 2px 2px 0px rgba(0,0,0,0.3); }
-        .subtitle { font-size: 1rem; color: var(--pop-cyan); font-weight: 700; margin-bottom: 5px; }
-        .quote-box { font-size: 0.95rem; font-style: italic; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin: 10px 0 20px 0; border-left: 4px solid var(--pop-pink); }
-        .timer-wrapper { position: relative; width: 220px; height: 220px; margin: 0 auto; }
-        .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .timer-circle-bg { fill: none; stroke: var(--input-bg); stroke-width: 12; stroke-linecap: round; }
-        .timer-circle-progress { fill: none; stroke: var(--pop-green); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 691; stroke-dashoffset: 691; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
-        .timer-info { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .timer-current-task { font-size: 1.1rem; font-weight: 700; margin-bottom: 5px; color: var(--text); }
-        .timer-countdown { font-size: 3rem; margin: 0; color: var(--text); letter-spacing: -1px; }
-        .timer-next { font-size: 0.85rem; color: var(--card-bg); background: var(--pop-cyan); padding: 4px 12px; border-radius: 20px; margin-top: 8px; font-weight: bold; }
-
-        /* DASHBOARD & DETAILS */
-        .dashboard-panel, .details-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 200; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow-y: auto; padding: 25px; box-sizing: border-box; color: var(--text); }
-        .dashboard-panel.open { transform: translateY(0); }
-        .details-panel { background: var(--card-bg); border-radius: 30px 30px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.4); max-height: 0; opacity: 0; position: relative; transform: none; top: auto; left: auto; z-index: 10; transition: max-height 0.5s ease, opacity 0.3s ease; }
-        .app-container.details-open .details-panel { max-height: 80vh; opacity: 1; padding-bottom: 100px; }
-        .dash-card { background: var(--input-bg); padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 2px solid transparent; transition: 0.3s; }
-        .dash-card:hover { border-color: var(--pop-cyan); transform: translateY(-3px); }
-        .dash-title { font-size: 1rem; color: var(--pop-yellow); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        .evaluate-btn { width: 100%; padding: 18px; background: var(--pop-green); color: #fff; border: none; border-radius: 16px; font-size: 1.1rem; cursor: pointer; box-shadow: 0 6px 0 #5f8d18; margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.1s; }
-        .evaluate-btn:active { transform: translateY(6px); box-shadow: none; }
-        .evaluate-btn:disabled { background: var(--text-muted); box-shadow: none; cursor: not-allowed; transform: translateY(6px); }
-        .journal-area { width: 100%; height: 120px; padding: 15px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: var(--text); font-family: 'Nunito', sans-serif; font-size: 1rem; resize: none; }
-        .journal-area:focus { outline: none; border-color: var(--pop-yellow); background: rgba(255,255,255,0.05); }
-        .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 0; font-size: 1rem; }
-        .bad-stat { color: var(--pop-pink); font-weight: bold; }
-
-        /* LIST & INPUTS */
-        .day-selector { display: flex; justify-content: space-between; margin-bottom: 20px; background: var(--input-bg); padding: 8px; border-radius: 20px; }
-        .day-btn { width: 42px; height: 42px; border-radius: 14px; border: none; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.2s; font-family: 'Fredoka', sans-serif; font-size: 1rem; }
-        .day-btn.active { background: var(--pop-cyan); color: #fff; box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3); transform: scale(1.1); }
-        .day-btn.today-indicator { color: var(--pop-yellow); }
-        .day-btn.active.today-indicator { color: #fff; background: var(--pop-yellow); }
-        .input-group { background: var(--input-bg); padding: 20px; border-radius: 20px; margin-bottom: 20px; position: relative; border: 2px solid rgba(255,255,255,0.05); }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .full-width { display: flex; gap: 10px; }
-        input, select { border: 2px solid transparent; padding: 12px; border-radius: 12px; width: 100%; background: rgba(0,0,0,0.3); color: var(--text); font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: bold; transition: 0.3s; }
-        input:focus, select:focus { outline: none; border-color: var(--pop-pink); background: rgba(0,0,0,0.5); }
-        button.add-btn { background: var(--pop-yellow); color: #0d1b2a; border: none; padding: 0 25px; border-radius: 12px; cursor: pointer; font-size: 1.5rem; min-width: 60px; font-weight: 900; box-shadow: 0 4px 0 #cc9a00; transition: 0.1s; }
-        button.add-btn:active { transform: translateY(4px); box-shadow: none; }
-        button.add-btn.editing-mode { background: var(--pop-pink); box-shadow: 0 4px 0 #b0004c; color: white; }
-        ul { list-style: none; padding: 0; margin: 0; }
-        li { display: flex; align-items: center; background: var(--input-bg); border-radius: 16px; margin-bottom: 12px; padding: 15px; color: var(--text); transition: 0.2s; position: relative; overflow: hidden; }
-        li::before { content:''; position:absolute; left:0; top:0; bottom:0; width:8px; background: currentColor; }
-        li.completed { opacity: 0.6; filter: grayscale(0.5); }
-        li.completed .task-desc { text-decoration: line-through; color: var(--text-muted); }
-        .task-checkbox { appearance: none; width: 26px; height: 26px; border: 3px solid var(--text-muted); border-radius: 8px; margin-left: 10px; margin-right: 15px; cursor: pointer; display: grid; place-items: center; transition: 0.2s; }
-        .task-checkbox::after { content: '✔'; font-weight: 900; color: #fff; font-size: 14px; display: none; }
-        .task-checkbox:checked { background: var(--pop-green); border-color: var(--pop-green); transform: scale(1.1); }
-        .task-checkbox:checked::after { display: block; }
-        .task-info { flex-grow: 1; }
-        .task-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px; }
-        .task-desc { font-size: 1.1rem; font-weight: 700; font-family: 'Nunito', sans-serif; }
-        .cat-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 8px; color: #fff; font-weight: 800; font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px; }
-        .punctuality-badge { font-size: 0.7rem; margin-left: auto; font-weight: 800; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 6px; }
-        .action-container { display: flex; gap: 10px; margin-left: 10px; }
-        .list-btn { background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1rem; color: var(--text); transition: 0.2s; display: grid; place-items: center; }
-        .list-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.2); }
-        .backup-btn { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 12px; border: 2px solid var(--text-muted); font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Fredoka', sans-serif; transition: 0.2s; background: transparent; color: var(--text-muted); }
-        .btn-download { border-color: var(--pop-cyan); color: var(--pop-cyan); }
-        .btn-download:hover { background: var(--pop-cyan); color: var(--card-bg); }
-        .btn-restore:hover { border-color: var(--text); color: var(--text); }
-        .fab-toggle { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: var(--pop-orange); color: #fff; border-radius: 20px; border: none; display: flex; justify-content: center; align-items: center; font-size: 2rem; box-shadow: 0 6px 0 #b83a00; cursor: pointer; z-index: 100; transition: 0.2s; }
-        .fab-toggle:active { transform: translateY(6px); box-shadow: none; }
-
-        /* MODAL LEITOR (V21) */
-        #bibleReaderModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
-        #bibleReaderModal.show { display: flex; opacity: 1; }
-        .reader-content { background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; border: 2px solid var(--pop-purple); box-shadow: 0 0 30px rgba(131, 56, 236, 0.4); }
+        /* MODAL LEITOR */
+        #bibleReaderModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; justify-content: center; align-items: center; }
+        #bibleReaderModal.show { display: flex; }
+        .reader-content { background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 20px; display: flex; flex-direction: column; border: 2px solid var(--pop-purple); }
         .reader-header { padding: 15px; background: var(--pop-purple); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .reader-body { padding: 20px; overflow-y: auto; flex-grow: 1; font-family: 'Nunito', sans-serif; font-size: 1.1rem; line-height: 1.6; color: var(--text); }
-        .reader-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); background: var(--input-bg); text-align: center; }
-        .verse-num { font-weight: bold; color: var(--pop-cyan); margin-right: 5px; font-size: 0.8rem; vertical-align: super; }
-        .confirm-read-btn { width: 100%; padding: 15px; background: var(--text-muted); color: var(--bg); border: none; border-radius: 12px; font-weight: 900; cursor: not-allowed; font-family: 'Fredoka', sans-serif; font-size: 1rem; transition: 0.3s; }
-        .confirm-read-btn.unlocked { background: var(--pop-green); color: white; cursor: pointer; box-shadow: 0 4px 0 #5f8d18; animation: pulse 1s infinite; }
-        .confirm-read-btn.unlocked:active { transform: translateY(4px); box-shadow: none; animation: none; }
-        .reading-progress-bar { height: 4px; background: rgba(0,0,0,0.3); width: 100%; }
-        .reading-progress-fill { height: 100%; background: var(--pop-green); width: 0%; transition: width 0.1s; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        .reader-body { padding: 20px; overflow-y: auto; flex-grow: 1; font-size: 1.1rem; line-height: 1.6; }
+        .confirm-read-btn { width: 100%; padding: 15px; background: var(--text-muted); border: none; font-weight: bold; cursor: not-allowed; }
+        .confirm-read-btn.unlocked { background: var(--pop-green); color: white; cursor: pointer; }
+        .reading-progress-bar { height: 4px; background: rgba(0,0,0,0.3); }
+        .reading-progress-fill { height: 100%; background: var(--pop-green); width: 0%; }
+        
+        .repeat-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: var(--text-muted); cursor: pointer; }
+        .repeat-btn.active { background: var(--pop-cyan); color: #fff; border-color: var(--pop-cyan); }
+        
+        .backup-btn { width: 100%; padding: 10px; margin-bottom: 10px; background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -181,44 +190,28 @@
     <div class="reader-content">
         <div class="reader-header">
             <h3 style="margin:0" id="bibleChapterTitle">Carregando...</h3>
-            <button onclick="closeReader()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">✕</button>
+            <button onclick="closeReader()" style="background:none; border:none; color:white; font-size:1.5rem;">✕</button>
         </div>
         <div class="reading-progress-bar"><div class="reading-progress-fill" id="readingProgress"></div></div>
         <div class="reader-body" id="bibleTextContent">
-            <div style="text-align:center; padding:50px; color:var(--text-muted);"><div style="font-size:2rem;">📖</div><p>Buscando...</p></div>
+            <div style="text-align:center; padding:50px;"><p>Buscando...</p></div>
         </div>
-        <div class="reader-footer">
+        <div style="padding:15px; border-top:1px solid rgba(255,255,255,0.1); background:var(--input-bg);">
             <button id="btnConfirmRead" class="confirm-read-btn" onclick="finishReading()">LEIA ATÉ O FIM...</button>
         </div>
     </div>
 </div>
 
-<div class="app-container" id="appContainer">
+<div class="app-container">
     
-    <div class="gamification-bar">
-        <div class="hud-row-1">
-            <div class="level-badge" id="userLevelBadge">Nível 1</div>
-            <div class="score-display">PONTOS: <span id="userScore">0</span></div>
-            <button class="btn-icon" onclick="toggleTheme()" id="themeBtn" style="width:30px; height:30px; font-size:1rem; background:var(--input-bg);">☀️</button>
-        </div>
-        <div class="medals-display">
-            <div class="medal-count" style="color:var(--pop-yellow)"><span class="medal-icon">🥇</span> <span id="cntGold">0</span>/10</div>
-            <div class="medal-count" style="color:#dfe6e9"><span class="medal-icon">🥈</span> <span id="cntSilver">0</span>/20</div>
-            <div class="medal-count" style="color:#e17055"><span class="medal-icon">🥉</span> <span id="cntBronze">0</span>/30</div>
-        </div>
-    </div>
-
-    <div class="header-section">
-        <div class="header-top-row">
-            <h1 id="headerDate">HOJE</h1>
-            <div class="header-actions">
-                <button class="btn-icon" id="alarmToggle" onclick="toggleAlarm()" title="Alarme">🔔</button>
-                <button class="btn-icon" onclick="openDashboard()" title="Perfil">📊</button>
+    <div id="view-home" class="view-section active">
+        <div class="header-simple">
+            <h1 class="header-title">FOCO</h1>
+            <div>
+                <button class="btn-icon-small" id="alarmToggle" onclick="toggleAlarm()">🔔</button>
             </div>
         </div>
-        <div class="subtitle" id="dayStatus">Sua Missão Hoje</div>
-        <div class="quote-box" id="dailyQuote">"Carregando..."</div>
-        
+
         <div class="timer-wrapper">
             <svg class="timer-svg" viewBox="0 0 240 240">
                 <circle class="timer-circle-bg" cx="120" cy="120" r="110"></circle>
@@ -230,237 +223,164 @@
                 <div class="timer-next" id="timerNextLabel">--</div>
             </div>
         </div>
+
+        <div class="quote-box" id="dailyQuote" style="margin-top:30px; text-align:center;">"Carregando..."</div>
+
+        <div class="quest-card" style="margin-top:20px;">
+            <div class="quest-header"><span class="quest-tag">MISSÃO DIÁRIA</span><span class="quest-xp">+50 XP</span></div>
+            <h3 style="margin:0 0 5px 0;">Leitura Bíblica 📖</h3>
+            <p style="margin:0; font-size:0.9rem; opacity:0.9;">Leia para fortalecer o espírito.</p>
+            <button class="quest-btn" id="btnBibleQuest" onclick="openBibleReader()">LER AGORA</button>
+            <div style="margin-top:10px; font-weight:bold;" id="bibleStreak">🔥 Ofensiva: 0 dias</div>
+        </div>
     </div>
 
-    <div class="dashboard-panel" id="dashboardPanel">
-        <div class="dash-header" style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            <h2 class="dash-title" style="margin:0; font-size:1.5rem; color:var(--pop-cyan);">Meu Progresso</h2>
-            <button class="btn-icon" onclick="closeDashboard()">✕</button>
+    <div id="view-tasks" class="view-section">
+        <div class="header-simple">
+            <h1 class="header-title">ROTINA</h1>
         </div>
-        
+
+        <div class="day-selector">
+            <button class="day-btn" onclick="switchViewDay(0)" id="btnDay0">D</button>
+            <button class="day-btn" onclick="switchViewDay(1)" id="btnDay1">S</button>
+            <button class="day-btn" onclick="switchViewDay(2)" id="btnDay2">T</button>
+            <button class="day-btn" onclick="switchViewDay(3)" id="btnDay3">Q</button>
+            <button class="day-btn" onclick="switchViewDay(4)" id="btnDay4">Q</button>
+            <button class="day-btn" onclick="switchViewDay(5)" id="btnDay5">S</button>
+            <button class="day-btn" onclick="switchViewDay(6)" id="btnDay6">S</button>
+        </div>
+
+        <div class="input-group">
+            <div class="input-row">
+                <input type="time" id="taskTime" required>
+                <select id="taskCategory">
+                    <option value="trabalho">Trabalho 💼</option>
+                    <option value="eclesiastico">Igreja ⛪</option>
+                    <option value="saude">Saúde 🍎</option>
+                    <option value="estudos">Estudos 📚</option>
+                    <option value="casa">Casa 🏠</option>
+                    <option value="lazer">Lazer 🎮</option>
+                    <option value="outros">Outros 📌</option>
+                </select>
+            </div>
+            <div class="full-width">
+                <input type="text" id="taskDesc" placeholder="Nome da tarefa..." required>
+                <button class="add-btn" id="mainActionBtn" onclick="handleAction()">+</button>
+            </div>
+            <div style="text-align: right;">
+                <button onclick="cancelEdit()" id="cancelEditBtn" style="display:none; background:transparent; color:var(--text-muted); border:none; cursor:pointer;">Cancelar</button>
+            </div>
+            
+            <div class="repeat-wrapper" id="repeatWrapper" style="margin-top:15px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px;">
+                <span style="font-size:0.8rem; color:var(--text-muted);">REPETIR:</span>
+                <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                    <button class="repeat-btn" onclick="toggleRepeat(0)" id="rep0">D</button>
+                    <button class="repeat-btn" onclick="toggleRepeat(1)" id="rep1">S</button>
+                    <button class="repeat-btn" onclick="toggleRepeat(2)" id="rep2">T</button>
+                    <button class="repeat-btn" onclick="toggleRepeat(3)" id="rep3">Q</button>
+                    <button class="repeat-btn" onclick="toggleRepeat(4)" id="rep4">Q</button>
+                    <button class="repeat-btn" onclick="toggleRepeat(5)" id="rep5">S</button>
+                    <button class="repeat-btn" onclick="toggleRepeat(6)" id="rep6">S</button>
+                </div>
+            </div>
+        </div>
+
+        <ul id="taskList"></ul>
+    </div>
+
+    <div id="view-profile" class="view-section">
+        <div class="header-simple">
+            <h1 class="header-title">PERFIL</h1>
+            <button class="btn-icon-small" onclick="toggleTheme()" id="themeBtn">☀️</button>
+        </div>
+
+        <div class="gamification-bar">
+            <div class="hud-row-1">
+                <div class="level-badge" id="userLevelBadge">Nível 1</div>
+                <div class="score-display">PONTOS: <span id="userScore">0</span></div>
+            </div>
+            <div class="medals-display">
+                <div class="medal-count" style="color:var(--pop-yellow)">🥇 <span id="cntGold">0</span></div>
+                <div class="medal-count" style="color:#dfe6e9">🥈 <span id="cntSilver">0</span></div>
+                <div class="medal-count" style="color:#e17055">🥉 <span id="cntBronze">0</span></div>
+            </div>
+        </div>
+
         <div class="daily-progress-container">
-            <div class="progress-label">
-                <span>Conclusão Hoje</span>
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:5px; font-weight:bold;">
+                <span>Progresso Hoje</span>
                 <span id="progressText">0%</span>
             </div>
             <div class="progress-track">
                 <div class="progress-fill" id="dayProgressBar"></div>
-                <div class="medal-marker marker-bronze" title="Bronze (50%)"></div>
-                <div class="medal-marker marker-silver" title="Prata (70%)"></div>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:5px;">
-                <span>Início</span>
-                <span>Bronze</span>
-                <span>Prata</span>
-                <span>Ouro</span>
+                <div class="medal-marker" style="left:50%;" title="Bronze"></div>
+                <div class="medal-marker" style="left:70%;" title="Prata"></div>
             </div>
         </div>
 
-        <div class="quest-card">
-            <div class="quest-header"><span class="quest-tag">MISSÃO DIÁRIA</span><span class="quest-xp">+50 XP</span></div>
-            <h3 style="margin:0 0 5px 0;">Leitura Bíblica 📖</h3>
-            <p style="margin:0; font-size:0.9rem; opacity:0.9;">Leia um capítulo para fortalecer o espírito.</p>
-            <button class="quest-btn" id="btnBibleQuest" onclick="openBibleReader()">LER AGORA</button>
-            <div class="quest-streak" id="bibleStreak" style="margin-top:10px; font-weight:bold;">🔥 Ofensiva: 0 dias</div>
-        </div>
-
-        <button class="evaluate-btn" id="btnEvaluate" onclick="evaluateDay()"><span>🌟</span> Avaliar Desempenho do Dia</button>
+        <button class="evaluate-btn" id="btnEvaluate" onclick="evaluateDay()">
+            <span>🏆</span> Avaliar Desempenho do Dia
+        </button>
 
         <div class="dash-card">
-            <div class="dash-title">⚠️ Tarefas Negligenciadas</div>
+            <div class="dash-title">⚠️ Negligenciadas</div>
             <div id="dashSkippedList"><p style="font-size:0.9rem; color:var(--text-muted);">Sem dados.</p></div>
         </div>
 
         <div class="dash-card">
-            <div class="dash-title">Próxima Conquista</div>
-            <div style="font-size:0.9rem; line-height:1.6;">
-                Junte para subir de nível:<br>
-                <span style="color:var(--pop-yellow); font-weight:bold;">10x Ouro</span> OU
-                <span style="color:#dfe6e9; font-weight:bold;">20x Prata</span> OU
-                <span style="color:#e17055; font-weight:bold;">30x Bronze</span>
-            </div>
-        </div>
-
-        <div class="dash-card">
             <div class="dash-title">Diário de Bordo 📝</div>
-            <textarea id="journalInput" class="journal-area" placeholder="O que aprendeu hoje?..." oninput="saveJournal()"></textarea>
+            <textarea id="journalInput" class="journal-area" placeholder="Notas do dia..." oninput="saveJournal()"></textarea>
         </div>
 
-        <div style="margin-top:30px; border-top:2px dashed rgba(255,255,255,0.1); padding-top:20px;">
-            <div class="dash-title" style="margin-bottom:15px; color:var(--text-muted);">Backup</div>
-            <button class="backup-btn btn-download" onclick="exportBackup()">📥 Salvar Progresso</button>
-            <button class="backup-btn btn-restore" onclick="document.getElementById('backupInput').click()">📤 Carregar Save</button>
+        <div style="margin-top:20px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:20px;">
+            <div class="dash-title">Dados</div>
+            <button class="backup-btn btn-download" onclick="exportBackup()">📥 Backup</button>
+            <button class="backup-btn btn-restore" onclick="document.getElementById('backupInput').click()">📤 Restaurar</button>
             <input type="file" id="backupInput" style="display:none" accept=".json" onchange="importBackup(this)">
         </div>
-        <button onclick="clearHistory()" style="color:var(--pop-pink); background:none; border:none; margin-top:20px; width:100%; font-weight:bold; cursor:pointer;">Reiniciar Jogo (Resetar)</button>
-        <div style="height:50px;"></div>
+        
+        <button onclick="clearHistory()" style="color:var(--pop-pink); background:none; border:none; margin-top:20px; width:100%; font-weight:bold; cursor:pointer;">RESETAR TUDO</button>
     </div>
 
-    <div class="details-panel" id="detailsPanel">
-        <div style="padding-top: 10px;">
-            <h3 style="text-align:center; color:var(--pop-cyan); margin-bottom:20px;">Editar Rotina</h3>
-            <div class="day-selector">
-                <button class="day-btn" onclick="switchViewDay(0)" id="btnDay0">D</button>
-                <button class="day-btn" onclick="switchViewDay(1)" id="btnDay1">S</button>
-                <button class="day-btn" onclick="switchViewDay(2)" id="btnDay2">T</button>
-                <button class="day-btn" onclick="switchViewDay(3)" id="btnDay3">Q</button>
-                <button class="day-btn" onclick="switchViewDay(4)" id="btnDay4">Q</button>
-                <button class="day-btn" onclick="switchViewDay(5)" id="btnDay5">S</button>
-                <button class="day-btn" onclick="switchViewDay(6)" id="btnDay6">S</button>
-            </div>
-            <div class="input-group">
-                <div class="input-row">
-                    <input type="time" id="taskTime" required>
-                    <select id="taskCategory">
-                        <option value="trabalho">Trabalho 💼</option>
-                        <option value="eclesiastico">Igreja ⛪</option>
-                        <option value="saude">Saúde 🍎</option>
-                        <option value="estudos">Estudos 📚</option>
-                        <option value="casa">Casa 🏠</option>
-                        <option value="lazer">Lazer 🎮</option>
-                        <option value="outros">Outros 📌</option>
-                    </select>
-                </div>
-                <div class="full-width">
-                    <input type="text" id="taskDesc" placeholder="Nome da tarefa..." required>
-                    <button class="add-btn" id="mainActionBtn" onclick="handleAction()">+</button>
-                </div>
-                <div style="text-align: right;">
-                    <button class="cancel-edit-btn" id="cancelEditBtn" onclick="cancelEdit()">Cancelar</button>
-                </div>
-                <div class="repeat-wrapper" id="repeatWrapper" style="margin-top:15px; border-top:2px dashed rgba(255,255,255,0.1); padding-top:10px;">
-                    <span style="font-size:0.8rem; color:var(--text-muted); font-weight:bold;">REPETIR:</span>
-                    <div style="display:flex; justify-content:space-between; margin-top:5px;">
-                        <button class="repeat-btn day-btn" onclick="toggleRepeat(0)" id="rep0" style="width:35px; height:35px;">D</button>
-                        <button class="repeat-btn day-btn" onclick="toggleRepeat(1)" id="rep1" style="width:35px; height:35px;">S</button>
-                        <button class="repeat-btn day-btn" onclick="toggleRepeat(2)" id="rep2" style="width:35px; height:35px;">T</button>
-                        <button class="repeat-btn day-btn" onclick="toggleRepeat(3)" id="rep3" style="width:35px; height:35px;">Q</button>
-                        <button class="repeat-btn day-btn" onclick="toggleRepeat(4)" id="rep4" style="width:35px; height:35px;">Q</button>
-                        <button class="repeat-btn day-btn" onclick="toggleRepeat(5)" id="rep5" style="width:35px; height:35px;">S</button>
-                        <button class="repeat-btn day-btn" onclick="toggleRepeat(6)" id="rep6" style="width:35px; height:35px;">S</button>
-                    </div>
-                </div>
-            </div>
-            <ul id="taskList"></ul>
-            <div style="height: 50px;"></div>
-        </div>
-    </div>
-    <button class="fab-toggle" id="toggleBtn" onclick="toggleDetails()">+</button>
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="switchTab('view-home', this)">
+            <i>🏠</i> FOCO
+        </button>
+        <button class="nav-btn" onclick="switchTab('view-tasks', this)">
+            <i>✅</i> ROTINA
+        </button>
+        <button class="nav-btn" onclick="switchTab('view-profile', this)">
+            <i>📊</i> PERFIL
+        </button>
+    </nav>
+
 </div>
 
 <script>
-    // --- LÓGICA DE FEEDBACK VISUAL (XP E PROGRESSO) ---
-    function showFloatingXP(amount) {
-        const el = document.createElement('div');
-        el.className = 'floating-xp';
-        el.innerText = `+${amount} XP`;
-        el.style.left = '50%';
-        el.style.top = '50%';
-        el.style.transform = 'translate(-50%, -50%)';
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 1500);
-        userScore += amount;
-        localStorage.setItem('userScore', userScore);
-        updateScoreUI();
-    }
-
-    function updateScoreUI() {
-        const scoreEl = document.getElementById('userScore');
-        const target = userScore;
-        scoreEl.innerText = target; 
-        scoreEl.style.color = '#fff';
-        setTimeout(() => scoreEl.style.color = 'var(--pop-cyan)', 300);
-    }
-
-    function updateDailyProgress() {
-        const tasks = allTasks[todayIndex];
-        const bar = document.getElementById('dayProgressBar');
-        const text = document.getElementById('progressText');
+    // --- LÓGICA DE NAVEGAÇÃO ---
+    function switchTab(viewId, btn) {
+        // Esconder todas as views
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        // Mostrar a selecionada
+        document.getElementById(viewId).classList.add('active');
         
-        if (!tasks || tasks.length === 0) {
-            bar.style.width = '0%';
-            text.innerText = '0%';
-            return;
+        // Atualizar botões
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Se for para Tasks, resetar edição
+        if(viewId === 'view-tasks') {
+            cancelEdit();
+            renderTasks();
         }
-
-        const completed = tasks.filter(t => t.done).length;
-        const total = tasks.length;
-        const percent = Math.round((completed / total) * 100);
-        
-        bar.style.width = `${percent}%`;
-        text.innerText = `${percent}%`;
-    }
-
-    // --- LEITOR BÍBLICO (V21 - BLINDADO) ---
-    let readingStartTime = 0; let isReadingComplete = false; const MIN_READING_SECONDS = 15;
-    const backupChapter = { title: "Salmos 23", text: ["O Senhor é o meu pastor; de nada terei falta.", "Em verdes pastagens me faz repousar...", "Ainda que eu andasse pelo vale da sombra da morte...", "Preparas uma mesa perante mim...", "Certamente que a bondade e a misericórdia..."] };
-
-    async function openBibleReader() {
-        const modal = document.getElementById('bibleReaderModal');
-        const contentDiv = document.getElementById('bibleTextContent');
-        const titleDiv = document.getElementById('bibleChapterTitle');
-        const btn = document.getElementById('btnConfirmRead');
-        const progress = document.getElementById('readingProgress');
-
-        modal.classList.add('show');
-        contentDiv.scrollTop = 0; progress.style.width = '0%';
-        btn.classList.remove('unlocked'); btn.innerText = `Lendo... (Mínimo ${MIN_READING_SECONDS}s)`; btn.disabled = true;
-        isReadingComplete = false; readingStartTime = Date.now();
-        contentDiv.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);"><div style="font-size:2rem;">📖</div><p>Buscando...</p></div>';
-
-        try {
-            const randomChapter = Math.floor(Math.random() * 150) + 1;
-            const response = await fetch(`https://www.abibliadigital.com.br/api/verses/acf/sl/${randomChapter}`);
-            if(!response.ok) throw new Error(`Erro API`);
-            const data = await response.json();
-            titleDiv.innerText = `${data.book.name} ${data.chapter.number}`;
-            let htmlContent = ''; data.verses.forEach(v => { htmlContent += `<p><span class="verse-num">${v.number}</span> ${v.text}</p>`; });
-            contentDiv.innerHTML = htmlContent;
-        } catch (e) {
-            console.log("Offline mode triggered");
-            showToast("Modo Offline Ativado", "warning");
-            titleDiv.innerText = `${backupChapter.title} (Offline)`;
-            let htmlContent = ''; backupChapter.text.forEach((v, i) => { htmlContent += `<p><span class="verse-num">${i+1}</span> ${v}</p>`; });
-            contentDiv.innerHTML = htmlContent;
-        }
-        setupScrollMonitor(contentDiv, progress);
-    }
-
-    function setupScrollMonitor(div, prog) {
-        div.onscroll = function() {
-            const pct = (div.scrollTop / (div.scrollHeight - div.clientHeight)) * 100;
-            prog.style.width = `${pct}%`;
-            if (div.scrollHeight <= div.clientHeight || div.scrollTop + div.clientHeight >= div.scrollHeight - 30) checkReadingRequirements();
-        };
-        setTimeout(() => { if (div.scrollHeight <= div.clientHeight) checkReadingRequirements(); }, 500);
-    }
-
-    function checkReadingRequirements() {
-        if (isReadingComplete) return;
-        const elapsed = (Date.now() - readingStartTime) / 1000;
-        const btn = document.getElementById('btnConfirmRead');
-        if (elapsed >= MIN_READING_SECONDS) {
-            isReadingComplete = true; btn.classList.add('unlocked'); btn.disabled = false; btn.innerText = "CONFIRMAR LEITURA ✅";
-        } else {
-            btn.innerText = `Leia com calma... (${Math.ceil(MIN_READING_SECONDS - elapsed)}s)`;
-            setTimeout(checkReadingRequirements, 1000);
+        // Se for para Profile, atualizar stats
+        if(viewId === 'view-profile') {
+            updateSkippedStats();
+            checkEvaluationButton();
         }
     }
 
-    function finishReading() {
-        if (!isReadingComplete) return;
-        closeReader(); completeBibleQuest();
-    }
-    function closeReader() { document.getElementById('bibleReaderModal').classList.remove('show'); }
-
-    // --- UTILS ---
-    function showToast(msg, type = 'info') {
-        const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `gamer-toast ${type}`;
-        let i = 'ℹ️'; if(type==='success')i='🎉'; if(type==='warning')i='⭐'; if(type==='error')i='❌'; if(type==='quest')i='✝️';
-        t.innerHTML = `<span>${i}</span> <span>${msg}</span>`; c.appendChild(t);
-        setTimeout(() => { t.style.animation = 'slideOut 0.3s forwards'; setTimeout(() => t.remove(), 300); }, 4000);
-    }
-
+    // --- CORES & DADOS ---
     const categoryColors = { 'trabalho': 'var(--cat-trabalho)', 'saude': 'var(--cat-saude)', 'estudos': 'var(--cat-estudos)', 'casa': 'var(--cat-casa)', 'lazer': 'var(--cat-lazer)', 'eclesiastico': 'var(--cat-eclesiastico)', 'outros': 'var(--cat-outros)' };
     const emptyWeek = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
     let allTasks = JSON.parse(localStorage.getItem('myRoutineTasksV7')) || emptyWeek;
@@ -475,13 +395,97 @@
     let alarmEnabled = false; let lastAlarmTime = null; const alarmAudio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
     const dailyQuotes = ["Tudo posso naquele que me fortalece.", "Seja forte e corajoso.", "Entrega o teu caminho ao Senhor.", "A alegria do Senhor é a nossa força."];
 
+    // --- INIT ---
     if (localStorage.getItem('lightMode') === 'true') document.body.classList.add('light-mode');
     updateHeaderDate(); checkDailyReset(); renderDayButtons(); updateMedalsUI(); updateScoreUI(); renderTasks(); renderQuote(); loadJournal(); checkBibleQuestState(); updateSkippedStats();
     setInterval(updateTimer, 1000); updateTimer(); checkEvaluationButton();
 
+    // --- FUNÇÕES DE FEEDBACK ---
+    function showToast(msg, type = 'info') {
+        const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `gamer-toast ${type}`;
+        let i = 'ℹ️'; if(type==='success')i='🎉'; if(type==='warning')i='⭐'; if(type==='error')i='❌'; if(type==='quest')i='✝️';
+        t.innerHTML = `<span>${i}</span> <span>${msg}</span>`; c.appendChild(t);
+        setTimeout(() => { t.style.animation = 'slideOut 0.3s forwards'; setTimeout(() => t.remove(), 300); }, 4000);
+    }
+    function showFloatingXP(amount) {
+        const el = document.createElement('div'); el.className = 'floating-xp'; el.innerText = `+${amount} XP`;
+        el.style.left = '50%'; el.style.top = '50%'; el.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(el); setTimeout(() => el.remove(), 1500);
+        userScore += amount; localStorage.setItem('userScore', userScore); updateScoreUI();
+    }
+    function updateScoreUI() { 
+        const el = document.getElementById('userScore'); el.innerText = userScore; el.style.color='#fff'; 
+        setTimeout(()=>el.style.color='var(--pop-cyan)',300); 
+    }
+    function updateDailyProgress() {
+        const tasks = allTasks[todayIndex]; const bar = document.getElementById('dayProgressBar'); const txt = document.getElementById('progressText');
+        if(!tasks || tasks.length===0){ bar.style.width='0%'; txt.innerText='0%'; return; }
+        const comp = tasks.filter(t=>t.done).length; const pct = Math.round((comp/tasks.length)*100);
+        bar.style.width=`${pct}%`; txt.innerText=`${pct}%`;
+    }
+
+    // --- CONTROLE DE TEMPO ---
+    function isTaskAllowed(taskTimeStr) {
+        if(viewIndex !== todayIndex) return "OK"; 
+        const now = new Date(); const [h, m] = taskTimeStr.split(':').map(Number);
+        const taskDate = new Date(); taskDate.setHours(h, m, 0, 0);
+        const diff = now - taskDate;
+        if (diff < -60000) return "WAIT"; 
+        if (diff > (24 * 60 * 60 * 1000)) return "EXPIRED";
+        return "OK";
+    }
+
+    // --- LEITOR BÍBLICO ---
+    let readingStartTime = 0; let isReadingComplete = false; const MIN_READING_SECONDS = 15;
+    const backupChapter = { title: "Salmos 23", text: ["O Senhor é o meu pastor...", "Em verdes pastagens...", "Ainda que eu andasse...", "Preparas uma mesa...", "Certamente que a bondade..."] };
+
+    async function openBibleReader() {
+        const modal = document.getElementById('bibleReaderModal'); const contentDiv = document.getElementById('bibleTextContent');
+        const titleDiv = document.getElementById('bibleChapterTitle'); const btn = document.getElementById('btnConfirmRead');
+        const progress = document.getElementById('readingProgress');
+        modal.classList.add('show'); contentDiv.scrollTop = 0; progress.style.width = '0%';
+        btn.classList.remove('unlocked'); btn.innerText = `Lendo... (Mínimo ${MIN_READING_SECONDS}s)`; btn.disabled = true;
+        isReadingComplete = false; readingStartTime = Date.now();
+        contentDiv.innerHTML = '<div style="text-align:center; padding:50px;"><div style="font-size:2rem;">📖</div><p>Buscando...</p></div>';
+        try {
+            const rc = Math.floor(Math.random() * 150) + 1;
+            const res = await fetch(`https://www.abibliadigital.com.br/api/verses/acf/sl/${rc}`);
+            if(!res.ok) throw new Error(); const data = await res.json();
+            titleDiv.innerText = `${data.book.name} ${data.chapter.number}`;
+            let html = ''; data.verses.forEach(v => { html += `<p><span class="verse-num">${v.number}</span> ${v.text}</p>`; });
+            contentDiv.innerHTML = html;
+        } catch (e) {
+            showToast("Modo Offline", "warning"); titleDiv.innerText = `${backupChapter.title} (Offline)`;
+            let html = ''; backupChapter.text.forEach((v, i) => { html += `<p><span class="verse-num">${i+1}</span> ${v}</p>`; });
+            contentDiv.innerHTML = html;
+        }
+        setupScrollMonitor(contentDiv, progress);
+    }
+    function setupScrollMonitor(div, prog) {
+        div.onscroll = function() {
+            const pct = (div.scrollTop / (div.scrollHeight - div.clientHeight)) * 100;
+            prog.style.width = `${pct}%`;
+            if (div.scrollHeight <= div.clientHeight || div.scrollTop + div.clientHeight >= div.scrollHeight - 30) checkReadingRequirements();
+        }; setTimeout(() => { if (div.scrollHeight <= div.clientHeight) checkReadingRequirements(); }, 500);
+    }
+    function checkReadingRequirements() {
+        if (isReadingComplete) return;
+        const elapsed = (Date.now() - readingStartTime) / 1000;
+        const btn = document.getElementById('btnConfirmRead');
+        if (elapsed >= MIN_READING_SECONDS) {
+            isReadingComplete = true; btn.classList.add('unlocked'); btn.disabled = false; btn.innerText = "CONFIRMAR LEITURA ✅";
+        } else {
+            btn.innerText = `Leia com calma... (${Math.ceil(MIN_READING_SECONDS - elapsed)}s)`;
+            setTimeout(checkReadingRequirements, 1000);
+        }
+    }
+    function finishReading() { if (!isReadingComplete) return; closeReader(); completeBibleQuest(); }
+    function closeReader() { document.getElementById('bibleReaderModal').classList.remove('show'); }
+
+    // --- QUESTS & AVALIAÇÃO ---
     function checkBibleQuestState() {
-        const todayStr = new Date().toLocaleDateString(); const btn = document.getElementById('btnBibleQuest'); const lbl = document.getElementById('bibleStreak');
-        lbl.innerText = `🔥 Ofensiva: ${bibleStreak} dias`;
+        const todayStr = new Date().toLocaleDateString(); const btn = document.getElementById('btnBibleQuest');
+        document.getElementById('bibleStreak').innerText = `🔥 Ofensiva: ${bibleStreak} dias`;
         if (lastBibleDate === todayStr) { btn.disabled = true; btn.innerText = "LIDO HOJE ✅"; btn.style.background = "rgba(255,255,255,0.2)"; btn.style.color = "#fff"; }
         else { btn.disabled = false; btn.innerText = "LER AGORA"; btn.style.background = "#fff"; btn.style.color = "#4a148c"; }
     }
@@ -489,9 +493,7 @@
         const todayStr = new Date().toLocaleDateString();
         if (lastBibleDate) { const d = new Date(); d.setDate(d.getDate()-1); if(lastBibleDate !== d.toLocaleDateString() && lastBibleDate !== todayStr) bibleStreak = 0; }
         bibleStreak++; lastBibleDate = todayStr; localStorage.setItem('bibleStreak', bibleStreak); localStorage.setItem('lastBibleDate', lastBibleDate);
-        medals.bronze += 5; saveMedals();
-        showFloatingXP(50);
-        showToast(`Ofensiva: ${bibleStreak} dias!`, "quest"); fireConfetti(true); checkBibleQuestState();
+        medals.bronze += 5; saveMedals(); showFloatingXP(50); showToast(`Ofensiva: ${bibleStreak} dias!`, "quest"); fireConfetti(true); checkBibleQuestState();
     }
 
     function evaluateDay() {
@@ -500,24 +502,12 @@
         const tasks = allTasks[todayIndex];
         if (!tasks || tasks.length === 0) { showToast("Sem tarefas hoje.", "warning"); return; }
         
-        // --- NOVO: BLOQUEIO POR HORÁRIO DA ÚLTIMA TAREFA ---
-        let lastTaskMinutes = 0;
-        let lastTaskTimeStr = "";
-        tasks.forEach(t => {
-            const [h, m] = t.time.split(':').map(Number);
-            const mins = h * 60 + m;
-            if(mins > lastTaskMinutes) { lastTaskMinutes = mins; lastTaskTimeStr = t.time; }
-        });
-        
-        const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
-        
-        // Bloqueia se ainda não chegou na hora da última tarefa
-        if (currentMinutes < lastTaskMinutes) {
-            showToast(`Aguarde a última tarefa (${lastTaskTimeStr})!`, "error");
-            return;
-        }
-        // ---------------------------------------------------
+        // --- BLOQUEIO DE HORÁRIO ---
+        let lastTaskMinutes = 0; let lastTaskTimeStr = "";
+        tasks.forEach(t => { const [h, m] = t.time.split(':').map(Number); const mins = h*60+m; if(mins>lastTaskMinutes){lastTaskMinutes=mins; lastTaskTimeStr=t.time;} });
+        const now = new Date(); const curMin = now.getHours()*60+now.getMinutes();
+        if(curMin < lastTaskMinutes) { showToast(`Aguarde a última tarefa (${lastTaskTimeStr})!`, "error"); return; }
+        // ---------------------------
 
         const total = tasks.length; const completed = tasks.filter(t => t.done).length;
         let punctual = 0; tasks.forEach(t => { if (t.done && t.completedAt) { const [h, m] = t.time.split(':').map(Number); const d = new Date(t.completedAt); const diff = (d.getHours()*60 + d.getMinutes()) - (h*60 + m); if (Math.abs(diff) <= 15) punctual++; } });
@@ -530,26 +520,15 @@
         checkEvaluationButton();
     }
 
-    // --- FUNÇÃO PARA CONTROLE DE TEMPO (NOVO) ---
-    function isTaskAllowed(taskTimeStr) {
-        if(viewIndex !== todayIndex) return "OK"; 
-        const now = new Date();
-        const [h, m] = taskTimeStr.split(':').map(Number);
-        const taskDate = new Date(); taskDate.setHours(h, m, 0, 0);
-        const diff = now - taskDate;
-        if (diff < -60000) return "WAIT"; 
-        if (diff > (24 * 60 * 60 * 1000)) return "EXPIRED";
-        return "OK";
-    }
-
+    // --- CORE & UTILS ---
     function updateSkippedStats() {
         const container = document.getElementById('dashSkippedList'); if (!container) return;
         if (historyLog.length === 0) { container.innerHTML = '<p style="font-size:0.9rem; color:var(--text-muted);">Sem dados.</p>'; return; }
         const skippedMap = {}; historyLog.forEach(t => { if (!t.done) skippedMap[t.title] = (skippedMap[t.title] || 0) + 1; });
-        const sortedSkipped = Object.entries(skippedMap).sort((a,b) => b[1] - a[1]).slice(0, 3);
+        const sorted = Object.entries(skippedMap).sort((a,b) => b[1] - a[1]).slice(0, 3);
         container.innerHTML = '';
-        if (sortedSkipped.length === 0) { container.innerHTML = '<p style="font-size:0.9rem; color:var(--pop-green);">Tudo em dia!</p>'; }
-        else { sortedSkipped.forEach(([title, count]) => { container.innerHTML += `<div class="stat-row"><span class="stat-name">${title}</span> <span class="stat-val bad-stat">${count}x</span></div>`; }); }
+        if (sorted.length === 0) container.innerHTML = '<p style="font-size:0.9rem; color:var(--pop-green);">Tudo em dia!</p>';
+        else sorted.forEach(([t, c]) => { container.innerHTML += `<div class="stat-row"><span class="stat-name">${t}</span> <span class="stat-val bad-stat">${c}x</span></div>`; });
     }
 
     function checkLevelUp() { if (medals.gold >= 10 || medals.silver >= 20 || medals.bronze >= 30) { userLevel++; medals.gold=0; medals.silver=0; medals.bronze=0; saveMedals(); showToast(`LEVEL UP! Nível ${userLevel}!`, "level-up"); fireConfetti(true); } updateMedalsUI(); }
@@ -560,14 +539,12 @@
     
     function toggleTask(index) { 
         const task = allTasks[viewIndex][index]; 
-        // Validação Rigorosa
         if (!task.done) {
             const status = isTaskAllowed(task.time);
             if (status === "WAIT") { showToast("Ainda não é hora!", "warning"); renderTasks(); return; }
             if (status === "EXPIRED") { showToast("Prazo expirado (24h)!", "error"); renderTasks(); return; }
         }
-        const wasDone = task.done;
-        task.done = !task.done; task.completedAt = task.done ? new Date().toISOString() : null; 
+        const wasDone = task.done; task.done = !task.done; task.completedAt = task.done ? new Date().toISOString() : null; 
         if(task.done && !wasDone) showFloatingXP(10); 
         saveAll(); renderTasks(); updateDailyProgress();
     }
@@ -587,14 +564,12 @@
     function saveJournal() { localStorage.setItem('dailyJournal', document.getElementById('journalInput').value); }
     function loadJournal() { const t = localStorage.getItem('dailyJournal'); if(t) document.getElementById('journalInput').value = t; }
     function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('lightMode', document.body.classList.contains('light-mode')); document.getElementById('themeBtn').innerText = document.body.classList.contains('light-mode') ? "🌙" : "☀️"; }
-    function exportBackup() { const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), score: userScore, journal: localStorage.getItem('dailyJournal'), bible: { streak: bibleStreak, date: lastBibleDate }, date: new Date().toISOString() }; const b = new Blob([JSON.stringify(data)], {type:'application/json'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href=u; a.download=`backup-v25-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Salvo!", "success"); }
+    function exportBackup() { const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), score: userScore, journal: localStorage.getItem('dailyJournal'), bible: { streak: bibleStreak, date: lastBibleDate }, date: new Date().toISOString() }; const b = new Blob([JSON.stringify(data)], {type:'application/json'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href=u; a.download=`backup-v26-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Salvo!", "success"); }
     function importBackup(elm) { const f = elm.files[0]; if(!f) return; if(!confirm('Restaurar?')) return; const r = new FileReader(); r.onload = e => { try { const d = JSON.parse(e.target.result); if(d.tasks) { localStorage.setItem('myRoutineTasksV7', d.tasks); if(d.history) localStorage.setItem('routineHistoryV7', d.history); if(d.medals) localStorage.setItem('userMedals', d.medals); if(d.level) localStorage.setItem('userLevel', d.level); if(d.score) localStorage.setItem('userScore', d.score); if(d.journal) localStorage.setItem('dailyJournal', d.journal); if(d.bible) { localStorage.setItem('bibleStreak', d.bible.streak); localStorage.setItem('lastBibleDate', d.bible.date); } showToast("Restaurado!", "success"); setTimeout(()=>location.reload(), 1000); } } catch(err) { showToast("Erro", "error"); } }; r.readAsText(f); }
     
     function updateHeaderDate() { document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); }
     function checkDailyReset() { const today = new Date().toLocaleDateString(); const last = localStorage.getItem('lastRoutineDateV7'); if(last && last !== today) { archiveTasks(last); for(let i=0; i<7; i++) allTasks[i] = allTasks[i].map(t => ({...t, done: false, completedAt: null})); saveAll(); } localStorage.setItem('lastRoutineDateV7', today); }
     function archiveTasks(date) { Object.values(allTasks).forEach(list => list.forEach(t => historyLog.push({ date: date, ...t }))); if(historyLog.length > 500) historyLog = historyLog.slice(-500); localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); }
-    function openDashboard() { document.getElementById('dashboardPanel').classList.add('open'); checkEvaluationButton(); checkBibleQuestState(); updateSkippedStats(); updateDailyProgress(); }
-    function closeDashboard() { document.getElementById('dashboardPanel').classList.remove('open'); }
     function clearHistory() { if(confirm('Resetar Tudo?')) { localStorage.clear(); location.reload(); } }
     function switchViewDay(i) { viewIndex = i; cancelEdit(); renderDayButtons(); renderTasks(); }
     function renderDayButtons() { for(let i=0; i<7; i++) { const btn = document.getElementById(`btnDay${i}`); btn.classList.remove('active', 'today-indicator'); if(i===viewIndex) btn.classList.add('active'); if(i===todayIndex) btn.classList.add('today-indicator'); } }
@@ -604,7 +579,6 @@
     function deleteTask(i) { if(confirm('Apagar?')) { allTasks[viewIndex].splice(i, 1); saveAll(); renderTasks(); showToast("Apagado.", "error"); } }
     function saveAll() { localStorage.setItem('myRoutineTasksV7', JSON.stringify(allTasks)); updateTimer(); }
     function toggleRepeat(i) { if(editingTaskIndex !== null) return; const btn = document.getElementById(`rep${i}`); if(selectedRepeats.has(i)) { selectedRepeats.delete(i); btn.classList.remove('active'); } else { selectedRepeats.add(i); btn.classList.add('active'); } }
-    function toggleDetails() { const c = document.getElementById('appContainer'); c.classList.toggle('details-open'); document.getElementById('toggleBtn').innerHTML = c.classList.contains('details-open') ? "✕" : "+"; }
     function toggleAlarm() { alarmEnabled = !alarmEnabled; const btn = document.getElementById('alarmToggle'); if(alarmEnabled) { btn.classList.add('active'); showToast("Alarme ON", "success"); if(Notification.permission!=='granted') Notification.requestPermission(); } else { btn.classList.remove('active'); showToast("Alarme OFF", "info"); } }
     function updateTimer() { const tasks = allTasks[todayIndex]; const elN = document.getElementById('timerTaskName'); const elC = document.getElementById('timerCountdown'); const elNext = document.getElementById('timerNextLabel'); const elCircle = document.getElementById('timerCircle'); const now = new Date(); const curMin = now.getHours()*60 + now.getMinutes(); 
         if(alarmEnabled && now.getSeconds() === 0) { const t = `${formatTime(now.getHours())}:${formatTime(now.getMinutes())}`; const match = tasks.find(tk => tk.time === t && !tk.done); if(match) { alarmAudio.play().catch(()=>{}); if(Notification.permission==='granted') new Notification("Rotina", {body: match.title}); showToast(match.title, "warning"); } }
