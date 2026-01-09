@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V26 - App Layout</title>
+    <title>Rotina Pro V26.1 - Fixed</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0d1b2a">
@@ -38,7 +38,7 @@
         body { 
             font-family: 'Nunito', sans-serif; background-color: var(--bg); color: var(--text); 
             margin: 0; display: flex; justify-content: center; min-height: 100vh; 
-            transition: 0.3s; overflow: hidden; /* Evita scroll no body, scroll é nas views */
+            transition: 0.3s; overflow: hidden;
             background-image: radial-gradient(var(--text-muted) 1px, transparent 1px);
             background-size: 30px 30px; background-blend-mode: overlay; opacity: 1;
         }
@@ -57,8 +57,8 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            padding-bottom: 90px; /* Espaço para o menu */
-            display: none; /* Oculto por padrão */
+            padding-bottom: 90px;
+            display: none;
             animation: fadeIn 0.3s ease-out;
         }
         .view-section.active { display: block; }
@@ -87,8 +87,7 @@
         .header-simple { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-title { font-size: 1.5rem; color: var(--pop-yellow); margin: 0; }
         
-        /* --- ESTILOS GERAIS (Mantidos da V25) --- */
-        /* Timer */
+        /* --- ESTILOS GERAIS --- */
         .timer-wrapper { position: relative; width: 240px; height: 240px; margin: 20px auto; }
         .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
         .timer-circle-bg { fill: none; stroke: var(--input-bg); stroke-width: 15; stroke-linecap: round; }
@@ -98,20 +97,18 @@
         .timer-countdown { font-size: 3.5rem; margin: 0; color: var(--text); letter-spacing: -1px; }
         .timer-next { font-size: 0.9rem; color: var(--card-bg); background: var(--pop-cyan); padding: 5px 15px; border-radius: 20px; margin-top: 10px; font-weight: bold; }
 
-        /* Cards e Widgets */
         .dash-card { background: var(--input-bg); padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.05); }
-        .dash-card:hover { border-color: var(--pop-cyan); }
         .dash-title { font-size: 1rem; color: var(--pop-yellow); margin-bottom: 10px; display: block; }
         
         .quest-card { background: linear-gradient(135deg, #6a1b9a, #4a148c); color: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 3px solid #ab47bc; box-shadow: 0 6px 0 #4a148c; position: relative; overflow: hidden; }
         .quest-card::after { content: '✝️'; position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.2; transform: rotate(-15deg); }
         .quest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .quest-tag { background: #ab47bc; font-size: 0.7rem; padding: 4px 8px; border-radius: 8px; font-weight: bold; }
+        .quest-xp { background: var(--pop-yellow); color: #000; padding: 4px 8px; border-radius: 8px; font-weight: 900; }
         .quest-btn { width: 100%; padding: 12px; margin-top: 15px; border: none; border-radius: 12px; background: #fff; color: #4a148c; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: 0.1s; }
         .quest-btn:active { transform: translateY(4px); box-shadow: none; }
         .quest-btn:disabled { background: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); cursor: default; transform: translateY(4px); box-shadow: none; }
 
-        /* Lista de Tarefas */
         .day-selector { display: flex; justify-content: space-between; margin-bottom: 20px; background: var(--input-bg); padding: 8px; border-radius: 20px; }
         .day-btn { width: 40px; height: 40px; border-radius: 12px; border: none; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.2s; }
         .day-btn.active { background: var(--pop-cyan); color: #fff; transform: scale(1.1); }
@@ -138,7 +135,6 @@
         .action-container { display: flex; gap: 10px; margin-left: 10px; }
         .list-btn { background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1rem; color: var(--text); }
 
-        /* HUD Perfil */
         .gamification-bar { background: var(--input-bg); padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; border: 2px solid rgba(255,255,255,0.05); }
         .hud-row-1 { display: flex; justify-content: space-between; align-items: center; }
         .level-badge { background: var(--pop-pink); padding: 5px 10px; border-radius: 8px; font-weight: bold; }
@@ -155,17 +151,14 @@
         .btn-icon-small { width: 35px; height: 35px; border-radius: 50%; border: none; background: rgba(255,255,255,0.1); color: var(--text); cursor: pointer; }
         .btn-icon-small.active { background: var(--pop-yellow); color: #000; }
 
-        /* XP FLUTUANTE */
         .floating-xp { position: fixed; color: var(--pop-yellow); font-family: 'Fredoka', sans-serif; font-weight: 900; font-size: 1.8rem; text-shadow: 2px 2px 0 rgba(0,0,0,0.5); pointer-events: none; z-index: 9999; animation: floatUpFade 1.5s ease-out forwards; }
         @keyframes floatUpFade { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.5); } }
 
-        /* TOASTS */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .gamer-toast { background: var(--card-bg); color: var(--text); padding: 15px 20px; border-radius: 16px; border: 2px solid var(--pop-cyan); box-shadow: 0 8px 20px rgba(0,0,0,0.3); font-family: 'Fredoka', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 10px; transform: translateX(120%); animation: slideIn 0.3s forwards; pointer-events: auto; }
         .gamer-toast.success { border-color: var(--pop-green); } .gamer-toast.error { border-color: var(--pop-pink); }
         @keyframes slideIn { to { transform: translateX(0); } } @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
 
-        /* MODAL LEITOR */
         #bibleReaderModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; justify-content: center; align-items: center; }
         #bibleReaderModal.show { display: flex; }
         .reader-content { background: var(--card-bg); width: 90%; max-width: 600px; height: 80vh; border-radius: 20px; display: flex; flex-direction: column; border: 2px solid var(--pop-purple); }
@@ -180,6 +173,8 @@
         .repeat-btn.active { background: var(--pop-cyan); color: #fff; border-color: var(--pop-cyan); }
         
         .backup-btn { width: 100%; padding: 10px; margin-bottom: 10px; background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); border-radius: 8px; cursor: pointer; }
+        .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 0; font-size: 1rem; }
+        .bad-stat { color: var(--pop-pink); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -194,7 +189,7 @@
         </div>
         <div class="reading-progress-bar"><div class="reading-progress-fill" id="readingProgress"></div></div>
         <div class="reader-body" id="bibleTextContent">
-            <div style="text-align:center; padding:50px;"><p>Buscando...</p></div>
+            <div style="text-align:center; padding:50px; color:var(--text-muted);"><div style="font-size:2rem;">📖</div><p>Buscando...</p></div>
         </div>
         <div style="padding:15px; border-top:1px solid rgba(255,255,255,0.1); background:var(--input-bg);">
             <button id="btnConfirmRead" class="confirm-read-btn" onclick="finishReading()">LEIA ATÉ O FIM...</button>
@@ -206,7 +201,10 @@
     
     <div id="view-home" class="view-section active">
         <div class="header-simple">
-            <h1 class="header-title">FOCO</h1>
+            <div>
+                <h1 class="header-title">FOCO</h1>
+                <div id="headerDate" style="font-size:0.9rem; color:var(--text-muted); font-weight:bold; margin-top:2px;">Carregando...</div>
+            </div>
             <div>
                 <button class="btn-icon-small" id="alarmToggle" onclick="toggleAlarm()">🔔</button>
             </div>
@@ -359,25 +357,12 @@
 <script>
     // --- LÓGICA DE NAVEGAÇÃO ---
     function switchTab(viewId, btn) {
-        // Esconder todas as views
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        // Mostrar a selecionada
         document.getElementById(viewId).classList.add('active');
-        
-        // Atualizar botões
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
         btn.classList.add('active');
-
-        // Se for para Tasks, resetar edição
-        if(viewId === 'view-tasks') {
-            cancelEdit();
-            renderTasks();
-        }
-        // Se for para Profile, atualizar stats
-        if(viewId === 'view-profile') {
-            updateSkippedStats();
-            checkEvaluationButton();
-        }
+        if(viewId === 'view-tasks') { cancelEdit(); renderTasks(); }
+        if(viewId === 'view-profile') { updateSkippedStats(); checkEvaluationButton(); }
     }
 
     // --- CORES & DADOS ---
@@ -484,8 +469,8 @@
 
     // --- QUESTS & AVALIAÇÃO ---
     function checkBibleQuestState() {
-        const todayStr = new Date().toLocaleDateString(); const btn = document.getElementById('btnBibleQuest');
-        document.getElementById('bibleStreak').innerText = `🔥 Ofensiva: ${bibleStreak} dias`;
+        const todayStr = new Date().toLocaleDateString(); const btn = document.getElementById('btnBibleQuest'); const lbl = document.getElementById('bibleStreak');
+        lbl.innerText = `🔥 Ofensiva: ${bibleStreak} dias`;
         if (lastBibleDate === todayStr) { btn.disabled = true; btn.innerText = "LIDO HOJE ✅"; btn.style.background = "rgba(255,255,255,0.2)"; btn.style.color = "#fff"; }
         else { btn.disabled = false; btn.innerText = "LER AGORA"; btn.style.background = "#fff"; btn.style.color = "#4a148c"; }
     }
@@ -579,6 +564,7 @@
     function deleteTask(i) { if(confirm('Apagar?')) { allTasks[viewIndex].splice(i, 1); saveAll(); renderTasks(); showToast("Apagado.", "error"); } }
     function saveAll() { localStorage.setItem('myRoutineTasksV7', JSON.stringify(allTasks)); updateTimer(); }
     function toggleRepeat(i) { if(editingTaskIndex !== null) return; const btn = document.getElementById(`rep${i}`); if(selectedRepeats.has(i)) { selectedRepeats.delete(i); btn.classList.remove('active'); } else { selectedRepeats.add(i); btn.classList.add('active'); } }
+    function toggleDetails() { const c = document.getElementById('appContainer'); c.classList.toggle('details-open'); document.getElementById('toggleBtn').innerHTML = c.classList.contains('details-open') ? "✕" : "+"; }
     function toggleAlarm() { alarmEnabled = !alarmEnabled; const btn = document.getElementById('alarmToggle'); if(alarmEnabled) { btn.classList.add('active'); showToast("Alarme ON", "success"); if(Notification.permission!=='granted') Notification.requestPermission(); } else { btn.classList.remove('active'); showToast("Alarme OFF", "info"); } }
     function updateTimer() { const tasks = allTasks[todayIndex]; const elN = document.getElementById('timerTaskName'); const elC = document.getElementById('timerCountdown'); const elNext = document.getElementById('timerNextLabel'); const elCircle = document.getElementById('timerCircle'); const now = new Date(); const curMin = now.getHours()*60 + now.getMinutes(); 
         if(alarmEnabled && now.getSeconds() === 0) { const t = `${formatTime(now.getHours())}:${formatTime(now.getMinutes())}`; const match = tasks.find(tk => tk.time === t && !tk.done); if(match) { alarmAudio.play().catch(()=>{}); if(Notification.permission==='granted') new Notification("Rotina", {body: match.title}); showToast(match.title, "warning"); } }
