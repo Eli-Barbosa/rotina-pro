@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rotina Pro V29 - Ultimate Cartoon</title>
+    <title>Rotina Pro V30 - AI Powered</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a2e">
@@ -11,47 +11,34 @@
     <link rel="icon" type="image/png" href="icon-512.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
-    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
             /* PALETA ANIME FUN */
-            --bg: #1a1a2e;         
-            --card-bg: #16213e;    
-            --text: #ffffff; 
-            --text-muted: #a9a9a9;
+            --bg: #1a1a2e; --card-bg: #16213e; --text: #ffffff; --text-muted: #a9a9a9;
             --pop-pink: #ff2a6d; --pop-yellow: #ffbd00; --pop-cyan: #05d5ff; --pop-green: #00ff9f; --pop-purple: #d35dff;
             --border-radius: 25px; --btn-shadow: 0 5px 0 rgba(0,0,0,0.3); --nav-height: 80px;
             --cat-trabalho: #05d5ff; --cat-saude: #00ff9f; --cat-estudos: #ff2a6d;
             --cat-casa: #ffbd00; --cat-lazer: #d35dff; --cat-eclesiastico: #ff9f1c; --cat-outros: #a0aab5;
         }
-
         body.light-mode { --bg: #fff5f5; --card-bg: #ffffff; --text: #2d3436; --text-muted: #636e72; --btn-shadow: 0 5px 0 #dfe6e9; }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Nunito', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: 0.3s; overflow: hidden; background-image: radial-gradient(rgba(255,255,255,0.1) 15%, transparent 16%); background-size: 20px 20px; }
-        
         h1, h2, h3, .level-badge, .timer-countdown, .dash-title, .evaluate-btn, .quest-title, .nav-btn, .header-title { font-family: 'Fredoka', sans-serif; letter-spacing: 0.5px; }
-        
         .app-container { width: 100%; max-width: 500px; background: transparent; height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-
-        /* VIEWS */
         .view-section { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .view-section.active { display: block; }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* HEADER */
+        /* UI ELEMENTS */
         .header-simple { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--card-bg); padding: 15px 20px; border-radius: var(--border-radius); box-shadow: var(--btn-shadow); border: 2px solid rgba(255,255,255,0.05); }
         .header-title { font-size: 1.8rem; color: var(--pop-yellow); margin: 0; text-transform: uppercase; text-shadow: 2px 2px 0px #000; }
         .header-date { font-size: 0.85rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase; }
-        
         .btn-icon-small { width: 45px; height: 45px; border-radius: 14px; border: none; background: var(--pop-cyan); color: #000; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 0 #009ac0; transition: 0.1s; display: grid; place-items: center; }
         .btn-icon-small:active { transform: translateY(4px); box-shadow: none; }
-
-        /* TIMER */
+        
         .timer-wrapper { position: relative; width: 220px; height: 220px; margin: 30px auto; background: var(--card-bg); border-radius: 50%; box-shadow: 0 10px 0 rgba(0,0,0,0.2); border: 5px solid rgba(255,255,255,0.05); }
         .timer-svg { transform: rotate(-90deg); width: 100%; height: 100%; padding: 10px; }
         .timer-circle-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 18; stroke-linecap: round; }
@@ -61,7 +48,6 @@
         .timer-countdown { font-size: 3.2rem; margin: 0; color: var(--text); letter-spacing: -1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.3); }
         .timer-next { font-size: 0.85rem; color: #000; background: var(--pop-yellow); padding: 5px 15px; border-radius: 20px; margin-top: 10px; font-weight: 800; box-shadow: 0 3px 0 #cc9a00; }
 
-        /* QUEST CARD */
         .quest-card { background: var(--pop-purple); color: white; padding: 20px; border-radius: var(--border-radius); margin-top: 20px; box-shadow: 0 6px 0 #8e24aa; position: relative; overflow: hidden; border: 3px solid rgba(255,255,255,0.2); }
         .quest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .quest-tag { background: rgba(0,0,0,0.3); font-size: 0.7rem; padding: 5px 10px; border-radius: 10px; font-weight: 800; }
@@ -70,68 +56,55 @@
         .quest-btn:active { transform: translateY(5px); box-shadow: none; }
         .quest-btn:disabled { background: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); cursor: default; transform: translateY(5px); box-shadow: none; }
 
-        /* TAREFAS */
         .day-selector { display: flex; justify-content: space-between; margin-bottom: 20px; background: var(--card-bg); padding: 10px; border-radius: var(--border-radius); box-shadow: var(--btn-shadow); }
         .day-btn { width: 42px; height: 42px; border-radius: 12px; border: none; background: transparent; color: var(--text-muted); font-weight: 800; cursor: pointer; transition: 0.2s; font-family: 'Fredoka', sans-serif; font-size: 1rem; }
         .day-btn.active { background: var(--pop-cyan); color: #000; box-shadow: 0 4px 0 #009ac0; transform: translateY(-2px); }
         .day-btn.today-indicator { color: var(--pop-yellow); }
         .day-btn.active.today-indicator { background: var(--pop-yellow); color: #000; box-shadow: 0 4px 0 #cc9a00; }
-
         .input-group { background: var(--card-bg); padding: 20px; border-radius: var(--border-radius); margin-bottom: 20px; box-shadow: var(--btn-shadow); }
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .full-width { display: flex; gap: 10px; }
         input, select { border: 2px solid transparent; padding: 12px; border-radius: 12px; width: 100%; background: rgba(0,0,0,0.3); color: var(--text); font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700; }
         input:focus, select:focus { outline: none; border-color: var(--pop-pink); background: rgba(0,0,0,0.5); }
-        
         button.add-btn { background: var(--pop-green); color: #000; border: none; padding: 0 20px; border-radius: 12px; cursor: pointer; font-size: 1.5rem; font-weight: 900; box-shadow: 0 5px 0 #00b36e; transition: 0.1s; display: grid; place-items: center; }
         button.add-btn:active { transform: translateY(5px); box-shadow: none; }
         button.add-btn.editing-mode { background: var(--pop-pink); box-shadow: 0 5px 0 #b0004c; color: white; }
-
         ul { list-style: none; padding: 0; margin: 0; }
         li { display: flex; align-items: center; background: var(--card-bg); border-radius: 16px; margin-bottom: 12px; padding: 15px; color: var(--text); position: relative; overflow: hidden; box-shadow: 0 4px 0 rgba(0,0,0,0.2); border: 2px solid transparent; transition: 0.2s; }
         li:hover { transform: scale(1.02); }
         li.completed { opacity: 0.6; filter: grayscale(0.6); box-shadow: none; transform: translateY(2px); }
         li.completed .task-desc { text-decoration: line-through; color: var(--text-muted); }
-        
         .task-checkbox { appearance: none; width: 28px; height: 28px; border: 3px solid var(--text-muted); border-radius: 8px; margin-right: 15px; cursor: pointer; display: grid; place-items: center; transition: 0.2s; background: transparent; }
         .task-checkbox::after { content: '✔'; font-weight: 900; color: #fff; font-size: 16px; display: none; }
         .task-checkbox:checked { background: var(--pop-green); border-color: var(--pop-green); transform: scale(1.1); box-shadow: 0 0 10px var(--pop-green); }
         .task-checkbox:checked::after { display: block; }
-
         .task-info { flex-grow: 1; }
         .task-header { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 2px; }
         .task-desc { font-size: 1.1rem; font-weight: 800; font-family: 'Nunito', sans-serif; }
         .cat-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 8px; color: #000; font-weight: 800; text-transform: uppercase; }
         .punctuality-badge { font-size: 0.7rem; margin-left: auto; font-weight: 900; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 8px; }
-        
         .action-container { display: flex; gap: 8px; margin-left: 10px; }
         .list-btn { background: rgba(255,255,255,0.1); border: none; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 1.2rem; color: var(--text); transition: 0.2s; display: grid; place-items: center; }
         .list-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.2); }
         .edit-btn-icon { color: var(--pop-yellow); }
         .delete-btn-icon { color: var(--pop-pink); }
 
-        /* PERFIL */
         .gamification-bar { background: var(--card-bg); padding: 20px; border-radius: 20px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--btn-shadow); }
         .hud-row-1 { display: flex; justify-content: space-between; align-items: center; }
         .level-badge { background: var(--pop-pink); color: white; padding: 5px 12px; border-radius: 10px; font-size: 1rem; box-shadow: 0 3px 0 #b0004c; }
         .score-display { font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--pop-cyan); font-weight: bold; text-shadow: 0 2px 0 rgba(0,0,0,0.3); }
         .medals-display { display: flex; gap: 15px; justify-content: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px; font-size: 0.9rem; }
         .medal-count { display: flex; align-items: center; gap: 5px; font-weight: 800; font-family: 'Fredoka', sans-serif; }
-        
         .evaluate-btn { width: 100%; padding: 18px; background: var(--pop-green); color: #000; border: none; border-radius: 16px; font-size: 1.1rem; cursor: pointer; box-shadow: 0 6px 0 #00b36e; margin-bottom: 20px; font-weight: 900; text-transform: uppercase; transition: 0.1s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .evaluate-btn:active { transform: translateY(6px); box-shadow: none; }
         .evaluate-btn:disabled { background: var(--text-muted); color: #555; box-shadow: none; cursor: not-allowed; transform: translateY(6px); }
-
         .dash-card { background: var(--card-bg); padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 2px solid transparent; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
         .dash-title { font-size: 1rem; color: var(--pop-yellow); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-weight: 700; text-transform: uppercase; }
-        .dash-title i { font-size: 1.4rem; color: var(--pop-cyan); }
-
         .backup-btn { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 12px; border: 2px solid var(--text-muted); font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Fredoka', sans-serif; transition: 0.2s; background: transparent; color: var(--text-muted); }
         .btn-download { border-color: var(--pop-cyan); color: var(--pop-cyan); }
         .btn-download:hover { background: var(--pop-cyan); color: #000; }
         .btn-restore:hover { border-color: var(--text); color: var(--text); }
 
-        /* TOASTS & XP */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .gamer-toast { background: #fff; color: #333; padding: 15px 25px; border-radius: 25px; border: 4px solid var(--pop-cyan); box-shadow: 0 8px 0 rgba(0,0,0,0.2); font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; transform: translateX(120%); animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; pointer-events: auto; }
         .gamer-toast.success { border-color: var(--pop-green); } .gamer-toast.warning { border-color: var(--pop-yellow); } .gamer-toast.error { border-color: var(--pop-pink); color: var(--pop-pink); } .gamer-toast.quest { border-color: var(--pop-purple); color: var(--pop-purple); }
@@ -139,42 +112,40 @@
         .floating-xp { position: fixed; color: var(--pop-yellow); font-family: 'Fredoka', sans-serif; font-weight: 900; font-size: 2.5rem; text-shadow: 3px 3px 0 #000; pointer-events: none; z-index: 9999; animation: floatUpFade 1.5s ease-out forwards; }
         @keyframes floatUpFade { 0% { opacity: 1; transform: translateY(0) scale(1) rotate(-10deg); } 100% { opacity: 0; transform: translateY(-80px) scale(1.5) rotate(10deg); } }
 
-        /* NAV BAR */
         .bottom-nav { position: absolute; bottom: 20px; left: 20px; right: 20px; height: 80px; background: var(--card-bg); border-radius: 30px; display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.05); }
         .nav-btn { background: none; border: none; color: var(--text-muted); font-size: 0.7rem; font-family: 'Fredoka', sans-serif; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; width: 70px; }
         .nav-btn i { font-size: 1.8rem; display: block; transition: 0.2s; }
         .nav-btn.active { color: var(--pop-yellow); transform: translateY(-8px); }
         .nav-btn.active i { filter: drop-shadow(0 4px 0 rgba(0,0,0,0.2)); transform: scale(1.1); color: var(--pop-cyan); }
 
-        /* MODAL LEITOR & QUIZ */
         #bibleReaderModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         #bibleReaderModal.show { display: flex; opacity: 1; }
         .reader-content { background: var(--card-bg); width: 90%; max-width: 600px; height: 85vh; border-radius: 30px; display: flex; flex-direction: column; overflow: hidden; border: 4px solid var(--pop-purple); box-shadow: 0 0 40px rgba(131, 56, 236, 0.6); }
         .reader-header { padding: 20px; background: var(--pop-purple); color: white; display: flex; justify-content: space-between; align-items: center; }
         .reader-body { padding: 25px; overflow-y: auto; flex-grow: 1; font-family: 'Nunito', sans-serif; font-size: 1.2rem; line-height: 1.7; color: var(--text); }
         .reader-footer { padding: 20px; border-top: 2px solid rgba(255,255,255,0.1); background: var(--input-bg); text-align: center; }
+        .verse-num { font-weight: 900; color: var(--pop-cyan); margin-right: 8px; font-size: 0.9rem; vertical-align: super; }
         .confirm-read-btn { width: 100%; padding: 18px; background: var(--text-muted); color: var(--bg); border: none; border-radius: 20px; font-weight: 900; cursor: not-allowed; font-family: 'Fredoka', sans-serif; font-size: 1.1rem; transition: 0.3s; }
         .confirm-read-btn.unlocked { background: var(--pop-green); color: #000; cursor: pointer; box-shadow: 0 6px 0 #00b36e; }
         .confirm-read-btn.unlocked:active { transform: translateY(6px); box-shadow: none; }
         .reading-progress-bar { height: 6px; background: rgba(0,0,0,0.3); width: 100%; }
         .reading-progress-fill { height: 100%; background: var(--pop-green); width: 0%; transition: width 0.1s; }
         
-        .verse-num { font-weight: 900; color: var(--pop-cyan); margin-right: 8px; font-size: 0.9rem; vertical-align: super; }
         .stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 0; font-size: 1rem; }
         .bad-stat { color: var(--pop-pink); font-weight: bold; }
         .daily-progress-container { margin-bottom: 20px; background: var(--input-bg); padding: 15px; border-radius: 16px; }
         .progress-track { height: 12px; background: rgba(0,0,0,0.3); border-radius: 6px; overflow: hidden; position: relative; margin-top: 5px; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--pop-orange), var(--pop-yellow), var(--pop-green)); width: 0%; transition: width 0.5s; }
         .quote-box { font-size: 1rem; font-style: italic; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 15px; border-radius: 16px; margin: 20px 0; border-left: 5px solid var(--pop-pink); text-align: center; }
-        
         .repeat-btn { width: 35px; height: 35px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); background: transparent; color: var(--text-muted); cursor: pointer; font-weight: bold; }
         .repeat-btn.active { background: var(--pop-cyan); color: #000; border-color: var(--pop-cyan); }
-        
+
         .quiz-container { text-align: center; padding: 20px; }
         .quiz-verse { font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; color: var(--pop-yellow); }
         .quiz-options { display: flex; flex-direction: column; gap: 10px; }
         .quiz-opt-btn { background: var(--input-bg); border: 2px solid rgba(255,255,255,0.1); color: white; padding: 15px; border-radius: 15px; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: 0.2s; }
         .quiz-opt-btn:hover { border-color: var(--pop-cyan); background: rgba(5, 213, 255, 0.1); }
+        .api-input { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-family: 'Nunito', sans-serif; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -196,8 +167,8 @@
         <div class="reader-body" id="quizContent" style="display:none;">
             <div class="quiz-container">
                 <i class="ph-fill ph-brain" style="font-size:3rem; color:var(--pop-purple); margin-bottom:15px;"></i>
-                <p>Complete o versículo para provar sua leitura:</p>
-                <div class="quiz-verse" id="quizVerseText">"O Senhor é meu _____"</div>
+                <p id="quizQuestionText">Carregando Desafio...</p>
+                <div class="quiz-verse" id="quizVerseText"></div>
                 <div class="quiz-options" id="quizOptions"></div>
             </div>
         </div>
@@ -333,6 +304,13 @@
         <button class="evaluate-btn" id="btnEvaluate" onclick="evaluateDay()">
             <i class="ph-fill ph-trophy"></i> Avaliar Desempenho
         </button>
+        
+        <div class="dash-card">
+            <div class="dash-title"><i class="ph-bold ph-robot"></i> Inteligência Artificial</div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Cole sua API Key da Groq para ativar o Quiz Inteligente. (Salva apenas no seu navegador)</p>
+            <input type="password" id="groqApiKey" class="api-input" placeholder="gsk_..." onchange="saveApiKey()">
+            <p style="font-size:0.7rem; color:var(--pop-green);" id="apiKeyStatus"></p>
+        </div>
 
         <div class="dash-card">
             <div class="dash-title"><i class="ph-bold ph-warning"></i> Negligenciadas</div>
@@ -369,17 +347,36 @@
 </div>
 
 <script>
-    // --- LÓGICA DE NAVEGAÇÃO ---
+    // --- API KEY MANAGEMENT ---
+    function saveApiKey() {
+        const key = document.getElementById('groqApiKey').value;
+        if(key.startsWith('gsk_')) {
+            localStorage.setItem('groqApiKey', key);
+            document.getElementById('apiKeyStatus').innerText = "Chave Salva! IA Ativada.";
+        } else {
+            document.getElementById('apiKeyStatus').innerText = "Chave inválida.";
+        }
+    }
+    
+    function loadApiKey() {
+        const key = localStorage.getItem('groqApiKey');
+        if(key) {
+            document.getElementById('groqApiKey').value = key;
+            document.getElementById('apiKeyStatus').innerText = "IA Ativada.";
+        }
+    }
+
+    // --- NAVEGAÇÃO ---
     function switchTab(viewId, btn) {
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.getElementById(viewId).classList.add('active');
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
         btn.classList.add('active');
         if(viewId === 'view-tasks') { cancelEdit(); renderTasks(); }
-        if(viewId === 'view-profile') { updateSkippedStats(); checkEvaluationButton(); }
+        if(viewId === 'view-profile') { updateSkippedStats(); checkEvaluationButton(); loadApiKey(); }
     }
 
-    // --- CORES & DADOS ---
+    // --- DADOS ---
     const categoryColors = { 'trabalho': 'var(--cat-trabalho)', 'saude': 'var(--cat-saude)', 'estudos': 'var(--cat-estudos)', 'casa': 'var(--cat-casa)', 'lazer': 'var(--cat-lazer)', 'eclesiastico': 'var(--cat-eclesiastico)', 'outros': 'var(--cat-outros)' };
     const emptyWeek = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
     let allTasks = JSON.parse(localStorage.getItem('myRoutineTasksV7')) || emptyWeek;
@@ -396,10 +393,10 @@
 
     // --- INIT ---
     if (localStorage.getItem('lightMode') === 'true') document.body.classList.add('light-mode');
-    updateHeaderDate(); checkDailyReset(); renderDayButtons(); updateMedalsUI(); updateScoreUI(); renderTasks(); renderQuote(); loadJournal(); checkBibleQuestState(); updateSkippedStats();
+    updateHeaderDate(); checkDailyReset(); renderDayButtons(); updateMedalsUI(); updateScoreUI(); renderTasks(); renderQuote(); loadJournal(); checkBibleQuestState(); updateSkippedStats(); loadApiKey();
     setInterval(updateTimer, 1000); updateTimer(); checkEvaluationButton();
 
-    // --- FUNÇÕES DE FEEDBACK ---
+    // --- FEEDBACK ---
     function showToast(msg, type = 'info') {
         const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `gamer-toast ${type}`;
         let i = '<i class="ph-fill ph-info"></i>'; 
@@ -427,21 +424,11 @@
         bar.style.width=`${pct}%`; txt.innerText=`${pct}%`;
     }
 
-    // --- CONTROLE DE TEMPO ---
-    function isTaskAllowed(taskTimeStr) {
-        if(viewIndex !== todayIndex) return "OK"; 
-        const now = new Date(); const [h, m] = taskTimeStr.split(':').map(Number);
-        const taskDate = new Date(); taskDate.setHours(h, m, 0, 0);
-        const diff = now - taskDate;
-        if (diff < -60000) return "WAIT"; 
-        if (diff > (24 * 60 * 60 * 1000)) return "EXPIRED";
-        return "OK";
-    }
-
-    // --- LEITOR BÍBLICO E QUIZ ---
+    // --- LEITOR BÍBLICO E QUIZ HÍBRIDO (LOCAL + AI) ---
     let readingStartTime = 0; let isReadingComplete = false; const MIN_READING_SECONDS = 15;
-    let currentChapterVerses = []; 
-    const backupChapter = { title: "Salmos 23", text: ["O Senhor é o meu pastor, nada me faltará.", "Deitar-me faz em verdes pastos, guia-me mansamente a águas tranquilas.", "Refrigera a minha alma; guia-me pelas veredas da justiça, por amor do seu nome.", "Ainda que eu andasse pelo vale da sombra da morte, não temeria mal algum, porque tu estás comigo; a tua vara e o teu cajado me consolam.", "Preparas uma mesa perante mim na presença dos meus inimigos, unges a minha cabeça com óleo, o meu cálice transborda.", "Certamente que a bondade e a misericórdia me seguirão todos os dias da minha vida; e habitarei na casa do Senhor por longos dias."] };
+    let currentChapterText = ""; // Texto completo para a IA
+    let currentChapterVerses = []; // Array para o modo local
+    const backupChapter = { title: "Salmos 23", text: ["O Senhor é o meu pastor, nada me faltará.", "Deitar-me faz em verdes pastos...", "Refrigera a minha alma...", "Ainda que eu andasse...", "Preparas uma mesa...", "Certamente que a bondade..."] };
 
     async function openBibleReader() {
         const modal = document.getElementById('bibleReaderModal');
@@ -453,16 +440,11 @@
         document.getElementById('readingProgress').style.width = '0%';
         
         const btn = document.getElementById('btnConfirmRead');
-        btn.classList.remove('unlocked'); 
-        btn.innerText = `Lendo... (Mínimo ${MIN_READING_SECONDS}s)`; 
-        btn.disabled = true;
-        btn.onclick = startQuiz; 
+        btn.classList.remove('unlocked'); btn.innerText = `Lendo... (${MIN_READING_SECONDS}s)`; btn.disabled = true; btn.onclick = startQuiz;
 
-        isReadingComplete = false; 
-        readingStartTime = Date.now();
-        
+        isReadingComplete = false; readingStartTime = Date.now();
         const contentDiv = document.getElementById('bibleTextContent');
-        contentDiv.innerHTML = '<div style="text-align:center; padding:50px;"><p>Buscando...</p></div>';
+        contentDiv.innerHTML = '<div style="text-align:center; padding:50px;"><i class="ph-duotone ph-spinner-gap" style="font-size:3rem; animation:spin 1s linear infinite;"></i><p>Carregando...</p></div>';
 
         try {
             const rc = Math.floor(Math.random() * 150) + 1;
@@ -471,7 +453,8 @@
             const data = await res.json();
             
             document.getElementById('bibleChapterTitle').innerText = `${data.book.name} ${data.chapter.number}`;
-            currentChapterVerses = data.verses.map(v => v.text); 
+            currentChapterVerses = data.verses.map(v => v.text);
+            currentChapterText = currentChapterVerses.join(" "); // Para a IA
             
             let html = ''; data.verses.forEach(v => { html += `<p><span class="verse-num">${v.number}</span> ${v.text}</p>`; });
             contentDiv.innerHTML = html;
@@ -479,6 +462,7 @@
             showToast("Modo Offline", "warning"); 
             document.getElementById('bibleChapterTitle').innerText = `${backupChapter.title} (Offline)`;
             currentChapterVerses = backupChapter.text;
+            currentChapterText = currentChapterVerses.join(" ");
             let html = ''; backupChapter.text.forEach((v, i) => { html += `<p><span class="verse-num">${i+1}</span> ${v}</p>`; });
             contentDiv.innerHTML = html;
         }
@@ -492,7 +476,6 @@
             if (div.scrollHeight <= div.clientHeight || div.scrollTop + div.clientHeight >= div.scrollHeight - 30) checkReadingRequirements();
         }; setTimeout(() => { if (div.scrollHeight <= div.clientHeight) checkReadingRequirements(); }, 500);
     }
-
     function checkReadingRequirements() {
         if (isReadingComplete) return;
         const elapsed = (Date.now() - readingStartTime) / 1000;
@@ -500,21 +483,74 @@
         if (elapsed >= MIN_READING_SECONDS) {
             isReadingComplete = true; btn.classList.add('unlocked'); btn.disabled = false; btn.innerText = "IR PARA O DESAFIO ➤";
         } else {
-            btn.innerText = `Leia com calma... (${Math.ceil(MIN_READING_SECONDS - elapsed)}s)`;
+            btn.innerText = `Lendo... (${Math.ceil(MIN_READING_SECONDS - elapsed)}s)`;
             setTimeout(checkReadingRequirements, 1000);
         }
     }
 
-    // --- QUIZ LOGIC ---
-    function startQuiz() {
+    // --- QUIZ LOGIC (AI OR LOCAL) ---
+    async function startQuiz() {
         document.getElementById('bibleTextContent').style.display = 'none';
         document.getElementById('readerFooter').style.display = 'none';
         document.getElementById('quizContent').style.display = 'block';
         document.getElementById('bibleChapterTitle').innerText = "Desafio do Sábio";
+        
+        const apiKey = localStorage.getItem('groqApiKey');
+        
+        // Se tiver API Key, usa IA
+        if (apiKey) {
+            document.getElementById('quizQuestionText').innerText = "A IA está gerando sua pergunta...";
+            document.getElementById('quizVerseText').innerText = "";
+            document.getElementById('quizOptions').innerHTML = "";
+            
+            try {
+                const prompt = `Gere 1 pergunta de múltipla escolha sobre este texto bíblico. O formato deve ser JSON: { "question": "texto da pergunta", "options": ["errada1", "certa", "errada2"], "answer": "certa" }. Texto: ${currentChapterText.substring(0, 1500)}`;
+                
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+                    body: JSON.stringify({
+                        model: "llama3-8b-8192",
+                        messages: [{ role: "user", content: prompt }],
+                        temperature: 0.5
+                    })
+                });
+                
+                if(!response.ok) throw new Error("Erro Groq");
+                
+                const json = await response.json();
+                const content = json.choices[0].message.content;
+                // Extrai JSON da resposta da IA (pode vir com markdown)
+                const jsonStr = content.substring(content.indexOf('{'), content.lastIndexOf('}')+1);
+                const quizData = JSON.parse(jsonStr);
+                
+                document.getElementById('quizQuestionText').innerText = quizData.question;
+                const opts = quizData.options.sort(() => Math.random() - 0.5);
+                const container = document.getElementById('quizOptions');
+                
+                opts.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'quiz-opt-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => checkAnswer(opt, quizData.answer);
+                    container.appendChild(btn);
+                });
+                return; // Sai da função, pois a IA funcionou
 
+            } catch (e) {
+                console.log("Erro na IA, usando fallback local", e);
+                showToast("Erro na IA. Usando modo local.", "warning");
+            }
+        }
+        
+        // --- FALLBACK LOCAL (Palavra Escondida) ---
+        generateLocalQuiz();
+    }
+
+    function generateLocalQuiz() {
+        document.getElementById('quizQuestionText').innerText = "Complete o versículo:";
         const validVerses = currentChapterVerses.filter(v => v.length > 20);
         const verse = validVerses.length > 0 ? validVerses[Math.floor(Math.random() * validVerses.length)] : currentChapterVerses[0];
-        
         const words = verse.split(' ');
         const validIndices = words.map((w, i) => w.length > 4 ? i : -1).filter(i => i !== -1);
         
@@ -522,43 +558,35 @@
         
         const hideIndex = validIndices[Math.floor(Math.random() * validIndices.length)];
         const correctWord = words[hideIndex].replace(/[.,;]/g, '');
-        
         words[hideIndex] = "_______";
-        const questionText = words.join(' ');
+        
+        document.getElementById('quizVerseText').innerText = `"${words.join(' ')}"`;
         
         const wrongOptions = ["Senhor", "Coração", "Vida", "Terra", "Céu", "Amor"].filter(w => w !== correctWord);
         const options = [correctWord, wrongOptions[0], wrongOptions[1]].sort(() => Math.random() - 0.5);
-
-        document.getElementById('quizVerseText').innerText = `"${questionText}"`;
-        const optContainer = document.getElementById('quizOptions');
-        optContainer.innerHTML = '';
         
+        const container = document.getElementById('quizOptions');
+        container.innerHTML = "";
         options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'quiz-opt-btn';
             btn.innerText = opt;
             btn.onclick = () => checkAnswer(opt, correctWord);
-            optContainer.appendChild(btn);
+            container.appendChild(btn);
         });
     }
 
     function checkAnswer(selected, correct) {
         if(selected === correct) {
-            fireConfetti(true);
-            showToast("Resposta Correta!", "success");
-            setTimeout(finishReading, 1000);
+            fireConfetti(true); showToast("Correto!", "success"); setTimeout(finishReading, 1000);
         } else {
-            showToast("Errado! Tente ler novamente amanhã.", "error");
-            setTimeout(closeReader, 1000);
+            showToast("Errado! Leia novamente.", "error"); setTimeout(closeReader, 1000);
         }
     }
-
-    function finishReading() {
-        closeReader(); completeBibleQuest();
-    }
+    function finishReading() { closeReader(); completeBibleQuest(); }
     function closeReader() { document.getElementById('bibleReaderModal').classList.remove('show'); }
 
-    // --- QUESTS & AVALIAÇÃO ---
+    // --- CORE ---
     function checkBibleQuestState() {
         const todayStr = new Date().toLocaleDateString(); const btn = document.getElementById('btnBibleQuest'); const lbl = document.getElementById('bibleStreak');
         lbl.innerText = `🔥 Ofensiva: ${bibleStreak} dias`;
@@ -569,20 +597,17 @@
         const todayStr = new Date().toLocaleDateString();
         if (lastBibleDate) { const d = new Date(); d.setDate(d.getDate()-1); if(lastBibleDate !== d.toLocaleDateString() && lastBibleDate !== todayStr) bibleStreak = 0; }
         bibleStreak++; lastBibleDate = todayStr; localStorage.setItem('bibleStreak', bibleStreak); localStorage.setItem('lastBibleDate', lastBibleDate);
-        medals.bronze += 5; saveMedals(); showFloatingXP(50); showToast(`Ofensiva: ${bibleStreak} dias!`, "quest"); checkBibleQuestState();
+        medals.bronze += 5; saveMedals(); showFloatingXP(50); showToast(`Ofensiva: ${bibleStreak} dias!`, "quest"); fireConfetti(true); checkBibleQuestState();
     }
-
     function evaluateDay() {
         const todayStr = new Date().toLocaleDateString();
         if (lastEvaluationDate === todayStr) { showToast("Já avaliado hoje!", "info"); return; }
         const tasks = allTasks[todayIndex];
         if (!tasks || tasks.length === 0) { showToast("Sem tarefas hoje.", "warning"); return; }
-        
         let lastTaskMinutes = 0; let lastTaskTimeStr = "";
         tasks.forEach(t => { const [h, m] = t.time.split(':').map(Number); const mins = h*60+m; if(mins>lastTaskMinutes){lastTaskMinutes=mins; lastTaskTimeStr=t.time;} });
         const now = new Date(); const curMin = now.getHours()*60+now.getMinutes();
         if(curMin < lastTaskMinutes) { showToast(`Aguarde a última tarefa (${lastTaskTimeStr})!`, "error"); return; }
-
         const total = tasks.length; const completed = tasks.filter(t => t.done).length;
         let punctual = 0; tasks.forEach(t => { if (t.done && t.completedAt) { const [h, m] = t.time.split(':').map(Number); const d = new Date(t.completedAt); const diff = (d.getHours()*60 + d.getMinutes()) - (h*60 + m); if (Math.abs(diff) <= 15) punctual++; } });
         const pRate = total>0?punctual/total:0; const cRate = total>0?completed/total:0; let won = null;
@@ -593,8 +618,8 @@
         if (won) { showToast(`Ganhou: ${won}`, "success"); lastEvaluationDate = todayStr; localStorage.setItem('lastEvalDate', lastEvaluationDate); saveMedals(); checkLevelUp(); }
         checkEvaluationButton();
     }
-
-    // --- CORE & UTILS ---
+    
+    // UTILS
     function updateSkippedStats() {
         const container = document.getElementById('dashSkippedList'); if (!container) return;
         if (historyLog.length === 0) { container.innerHTML = '<p style="font-size:0.9rem; color:var(--text-muted);">Sem dados.</p>'; return; }
@@ -604,49 +629,35 @@
         if (sorted.length === 0) container.innerHTML = '<p style="font-size:0.9rem; color:var(--pop-green);">Tudo em dia!</p>';
         else sorted.forEach(([t, c]) => { container.innerHTML += `<div class="stat-row"><span class="stat-name">${t}</span> <span class="stat-val bad-stat">${c}x</span></div>`; });
     }
-
     function checkLevelUp() { if (medals.gold >= 10 || medals.silver >= 20 || medals.bronze >= 30) { userLevel++; medals.gold=0; medals.silver=0; medals.bronze=0; saveMedals(); showToast(`LEVEL UP! Nível ${userLevel}!`, "level-up"); fireConfetti(true); } updateMedalsUI(); }
     function saveMedals() { localStorage.setItem('userMedals', JSON.stringify(medals)); localStorage.setItem('userLevel', userLevel); updateMedalsUI(); }
     function updateMedalsUI() { document.getElementById('userLevelBadge').innerText = `Nível ${userLevel}`; document.getElementById('cntGold').innerText = medals.gold; document.getElementById('cntSilver').innerText = medals.silver; document.getElementById('cntBronze').innerText = medals.bronze; }
     function checkEvaluationButton() { const todayStr = new Date().toLocaleDateString(); const btn = document.getElementById('btnEvaluate'); if (lastEvaluationDate === todayStr) { btn.disabled = true; btn.innerHTML = "<i class='ph-bold ph-check'></i> Dia Avaliado"; btn.style.background = "var(--input-bg)"; } else { btn.disabled = false; btn.innerHTML = "<i class='ph-fill ph-trophy'></i> Avaliar Desempenho"; btn.style.background = ""; } }
     function fireConfetti(isBig) { confetti({ particleCount: isBig?150:50, spread: 70, origin: { y: 0.6 } }); }
-    
     function toggleTask(index) { 
         const task = allTasks[viewIndex][index]; 
-        if (!task.done) {
-            const status = isTaskAllowed(task.time);
-            if (status === "WAIT") { showToast("Ainda não é hora!", "warning"); renderTasks(); return; }
-            if (status === "EXPIRED") { showToast("Prazo expirado (24h)!", "error"); renderTasks(); return; }
-        }
+        if (!task.done) { const status = isTaskAllowed(task.time); if (status === "WAIT") { showToast("Ainda não é hora!", "warning"); renderTasks(); return; } if (status === "EXPIRED") { showToast("Prazo expirado (24h)!", "error"); renderTasks(); return; } }
         const wasDone = task.done; task.done = !task.done; task.completedAt = task.done ? new Date().toISOString() : null; 
         if(task.done && !wasDone) showFloatingXP(10); 
         saveAll(); renderTasks(); updateDailyProgress();
     }
-    
     function renderTasks() {
         const list = document.getElementById('taskList'); list.innerHTML = ''; let tasks = allTasks[viewIndex]; tasks.sort((a,b) => a.time.localeCompare(b.time));
         tasks.forEach((t, i) => {
-            const li = document.createElement('li'); li.className = t.done ? 'completed' : ''; li.style.color = categoryColors[t.category] || categoryColors['outros'];
-            const catVar = categoryColors[t.category] || categoryColors['outros'];
-            li.style.boxShadow = `inset 5px 0 0 ${catVar}`; 
-            
+            const li = document.createElement('li'); li.className = t.done ? 'completed' : ''; const catVar = categoryColors[t.category] || categoryColors['outros']; li.style.boxShadow = `inset 5px 0 0 ${catVar}`; 
             let badges = ''; if (t.done && t.completedAt) { const [h, m] = t.time.split(':').map(Number); const d = new Date(t.completedAt); const diff = (d.getHours()*60 + d.getMinutes()) - (h*60 + m); if (diff > 15) badges += ` <span class="punctuality-badge" style="color:var(--pop-pink)">ATRASO</span>`; else if (diff < -15) badges += ` <span class="punctuality-badge" style="color:var(--pop-green)">CEDO</span>`; else badges += ` <span class="punctuality-badge" style="color:var(--pop-yellow)">PONTUAL</span>`; }
-            
             const catLabel = `<span class="cat-badge" style="background:${catVar}; color:#000;">${t.category.toUpperCase()}</span>`;
-
             li.innerHTML = `<input type="checkbox" class="task-checkbox" ${t.done?'checked':''} onchange="toggleTask(${i})"> <div class="task-info"> <div class="task-header"><span class="task-time" style="color:var(--text); font-weight:800;">${t.time}</span> ${catLabel} ${badges}</div> <span class="task-desc">${t.title}</span> </div> <div class="action-container"><button class="list-btn edit-btn-icon" onclick="startEdit(${i})"><i class="ph-bold ph-pencil-simple"></i></button><button class="list-btn delete-btn-icon" onclick="deleteTask(${i})"><i class="ph-bold ph-trash"></i></button></div>`;
             list.appendChild(li);
-        });
-        updateDailyProgress();
+        }); updateDailyProgress();
     }
-
+    function isTaskAllowed(taskTimeStr) { if(viewIndex !== todayIndex) return "OK"; const now = new Date(); const [h, m] = taskTimeStr.split(':').map(Number); const taskDate = new Date(); taskDate.setHours(h, m, 0, 0); const diff = now - taskDate; if (diff < -60000) return "WAIT"; if (diff > (24 * 60 * 60 * 1000)) return "EXPIRED"; return "OK"; }
     function renderQuote() { document.getElementById('dailyQuote').innerText = dailyQuotes[Math.floor(Math.random() * dailyQuotes.length)]; }
     function saveJournal() { localStorage.setItem('dailyJournal', document.getElementById('journalInput').value); }
     function loadJournal() { const t = localStorage.getItem('dailyJournal'); if(t) document.getElementById('journalInput').value = t; }
     function toggleTheme() { document.body.classList.toggle('light-mode'); localStorage.setItem('lightMode', document.body.classList.contains('light-mode')); document.getElementById('themeBtn').innerHTML = document.body.classList.contains('light-mode') ? '<i class="ph-fill ph-moon"></i>' : '<i class="ph-fill ph-sun"></i>'; }
-    function exportBackup() { const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), score: userScore, journal: localStorage.getItem('dailyJournal'), bible: { streak: bibleStreak, date: lastBibleDate }, date: new Date().toISOString() }; const b = new Blob([JSON.stringify(data)], {type:'application/json'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href=u; a.download=`backup-v29-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Salvo!", "success"); }
+    function exportBackup() { const data = { tasks: localStorage.getItem('myRoutineTasksV7'), history: localStorage.getItem('routineHistoryV7'), medals: localStorage.getItem('userMedals'), level: localStorage.getItem('userLevel'), score: userScore, journal: localStorage.getItem('dailyJournal'), bible: { streak: bibleStreak, date: lastBibleDate }, date: new Date().toISOString() }; const b = new Blob([JSON.stringify(data)], {type:'application/json'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href=u; a.download=`backup-v30-${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); showToast("Salvo!", "success"); }
     function importBackup(elm) { const f = elm.files[0]; if(!f) return; if(!confirm('Restaurar?')) return; const r = new FileReader(); r.onload = e => { try { const d = JSON.parse(e.target.result); if(d.tasks) { localStorage.setItem('myRoutineTasksV7', d.tasks); if(d.history) localStorage.setItem('routineHistoryV7', d.history); if(d.medals) localStorage.setItem('userMedals', d.medals); if(d.level) localStorage.setItem('userLevel', d.level); if(d.score) localStorage.setItem('userScore', d.score); if(d.journal) localStorage.setItem('dailyJournal', d.journal); if(d.bible) { localStorage.setItem('bibleStreak', d.bible.streak); localStorage.setItem('lastBibleDate', d.bible.date); } showToast("Restaurado!", "success"); setTimeout(()=>location.reload(), 1000); } } catch(err) { showToast("Erro", "error"); } }; r.readAsText(f); }
-    
     function updateHeaderDate() { document.getElementById('headerDate').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }); }
     function checkDailyReset() { const today = new Date().toLocaleDateString(); const last = localStorage.getItem('lastRoutineDateV7'); if(last && last !== today) { archiveTasks(last); for(let i=0; i<7; i++) allTasks[i] = allTasks[i].map(t => ({...t, done: false, completedAt: null})); saveAll(); } localStorage.setItem('lastRoutineDateV7', today); }
     function archiveTasks(date) { Object.values(allTasks).forEach(list => list.forEach(t => historyLog.push({ date: date, ...t }))); if(historyLog.length > 500) historyLog = historyLog.slice(-500); localStorage.setItem('routineHistoryV7', JSON.stringify(historyLog)); }
